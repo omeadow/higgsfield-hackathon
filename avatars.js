@@ -23,4 +23,15 @@ async function downloadAvatar(username, url) {
   }
 }
 
-module.exports = { downloadAvatar, AVATARS_DIR };
+async function downloadAvatarsBatch(profiles, concurrency = 10) {
+  const queue = [...profiles];
+  const workers = Array.from({ length: concurrency }, async () => {
+    while (queue.length > 0) {
+      const p = queue.shift();
+      await downloadAvatar(p.username, p.profilePicUrl);
+    }
+  });
+  await Promise.all(workers);
+}
+
+module.exports = { downloadAvatar, downloadAvatarsBatch, AVATARS_DIR };

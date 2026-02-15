@@ -2,59 +2,122 @@ require("dotenv").config();
 const { ApifyClient } = require("apify-client");
 const fs = require("fs");
 const { upsertCreator, upsertPost } = require("./db");
-const { downloadAvatar } = require("./avatars");
+const { downloadAvatarsBatch } = require("./avatars");
 
 const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
 
-async function scrapeHashtag() {
-  console.log("Starting hashtag scrape for #higgsfield...");
+const HASHTAGS = ["higgsfield", "higgsai", "aivideo", "aifilmmaking", "cinemastudio", "klingai", "seedance"];
+const KEYWORD = "higgsfield";
+const TARGET_PROFILES = 500;
+const POSTS_PER_HASHTAG = 1000;
+const BATCH_SIZE = 50;
 
-  // Step 1: Scrape posts from the #higgsfield hashtag
-  const hashtagRun = await client.actor("apify/instagram-hashtag-scraper").call({
-    hashtags: ["higgsfield"],
-    resultsLimit: 200,
-  });
+async function scrapeHashtags() {
+  const allPosts = [];
 
-  const hashtagDataset = await client
-    .dataset(hashtagRun.defaultDatasetId)
-    .listItems();
-  const posts = hashtagDataset.items;
+  for (const tag of HASHTAGS) {
+    console.log(`Scraping hashtag #${tag}...`);
+    try {
+      const run = await client.actor("apify/instagram-hashtag-scraper").call({
+        hashtags: [tag],
+        resultsLimit: POSTS_PER_HASHTAG,
+      });
+      const dataset = await client.dataset(run.defaultDatasetId).listItems();
+      console.log(`  #${tag}: ${dataset.items.length} posts`);
+      allPosts.push(...dataset.items);
+    } catch (err) {
+      console.warn(`  Failed to scrape #${tag}: ${err.message}`);
+    }
+  }
 
-  console.log(`Found ${posts.length} posts with #higgsfield`);
+  return allPosts;
+}
 
-  // Step 2: Extract unique profile usernames from the posts
-  const usernames = [...new Set(posts.map((p) => p.ownerUsername).filter(Boolean))];
-  console.log(`Found ${usernames.length} unique creators`);
+async function searchKeyword() {
+  console.log(`Searching keyword "${KEYWORD}"...`);
+  try {
+    const run = await client.actor("apify/instagram-scraper").call({
+      search: KEYWORD,
+      searchType: "hashtag",
+      resultsLimit: POSTS_PER_HASHTAG,
+    });
+    const dataset = await client.dataset(run.defaultDatasetId).listItems();
+    console.log(`  Keyword search: ${dataset.items.length} results`);
+    return dataset.items;
+  } catch (err) {
+    console.warn(`  Keyword search failed: ${err.message}`);
+    return [];
+  }
+}
 
-  // Save the raw posts
-  fs.writeFileSync(
-    "data/hashtag_posts.json",
-    JSON.stringify(posts, null, 2)
-  );
+async function scrapeProfilesBatch(usernames) {
+  try {
+    const run = await client.actor("apify/instagram-profile-scraper").call({
+      usernames,
+      resultsLimit: 1,
+    });
+    const dataset = await client.dataset(run.defaultDatasetId).listItems();
+    return dataset.items;
+  } catch (err) {
+    console.warn(`  Batch failed: ${err.message}`);
+    return [];
+  }
+}
 
-  // Step 3: Scrape full profile data for each creator
-  console.log("Scraping creator profiles...");
+async function main() {
+  console.log(`Target: ${TARGET_PROFILES} creator profiles`);
+  console.log(`Hashtags: ${HASHTAGS.map(h => "#" + h).join(", ")}`);
+  console.log("");
 
-  const profileRun = await client.actor("apify/instagram-profile-scraper").call({
-    usernames,
-    resultsLimit: 1,
-  });
+  // Step 1: Collect posts from hashtags + keyword search
+  const hashtagPosts = await scrapeHashtags();
+  const keywordPosts = await searchKeyword();
+  const allPosts = [...hashtagPosts, ...keywordPosts];
 
-  const profileDataset = await client
-    .dataset(profileRun.defaultDatasetId)
-    .listItems();
-  const profiles = profileDataset.items;
+  console.log(`\nTotal posts collected: ${allPosts.length}`);
 
-  console.log(`Scraped ${profiles.length} creator profiles`);
+  // Save raw posts
+  fs.writeFileSync("data/hashtag_posts.json", JSON.stringify(allPosts, null, 2));
 
-  // Save profiles
-  fs.writeFileSync(
-    "data/creator_profiles.json",
-    JSON.stringify(profiles, null, 2)
-  );
+  // Step 2: Deduplicate usernames
+  const allUsernames = [...new Set(allPosts.map((p) => p.ownerUsername).filter(Boolean))];
+  const usernames = allUsernames.slice(0, TARGET_PROFILES);
+  console.log(`Unique creators found: ${allUsernames.length}`);
+  console.log(`Will scrape: ${usernames.length} profiles\n`);
 
-  // Step 4: Build a summary
-  const summary = profiles.map((p) => ({
+  // Step 3: Batch profile scraping
+  const allProfiles = [];
+  const totalBatches = Math.ceil(usernames.length / BATCH_SIZE);
+
+  for (let i = 0; i < usernames.length; i += BATCH_SIZE) {
+    const batch = usernames.slice(i, i + BATCH_SIZE);
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    console.log(`Batch ${batchNum}/${totalBatches} — scraping ${batch.length} profiles...`);
+
+    const profiles = await scrapeProfilesBatch(batch);
+    console.log(`  Got ${profiles.length} profiles`);
+
+    // Persist incrementally to DB
+    for (const profile of profiles) {
+      upsertCreator(profile);
+      if (profile.latestPosts) {
+        for (const post of profile.latestPosts) {
+          upsertPost(post, profile.username);
+        }
+      }
+    }
+
+    // Download avatars for this batch
+    await downloadAvatarsBatch(profiles);
+
+    allProfiles.push(...profiles);
+    console.log(`  Progress: ${allProfiles.length}/${usernames.length} profiles saved\n`);
+  }
+
+  // Step 4: Save combined JSON files
+  fs.writeFileSync("data/creator_profiles.json", JSON.stringify(allProfiles, null, 2));
+
+  const summary = allProfiles.map((p) => ({
     username: p.username,
     fullName: p.fullName,
     biography: p.biography,
@@ -65,30 +128,13 @@ async function scrapeHashtag() {
     profileUrl: `https://www.instagram.com/${p.username}/`,
   }));
 
-  fs.writeFileSync(
-    "data/creator_summary.json",
-    JSON.stringify(summary, null, 2)
-  );
+  fs.writeFileSync("data/creator_summary.json", JSON.stringify(summary, null, 2));
 
-  // Step 5: Save to database
-  console.log("Saving to database...");
-  for (const profile of profiles) {
-    upsertCreator(profile);
-    if (profile.latestPosts) {
-      for (const post of profile.latestPosts) {
-        upsertPost(post, profile.username);
-      }
-    }
-  }
-
-  // Step 6: Download avatars
-  console.log("Downloading avatars...");
-  await Promise.all(
-    profiles.map((p) => downloadAvatar(p.username, p.profilePicUrl))
-  );
-
-  console.log("Done! Results saved to data/ and database");
-  console.log("\nTop creators by followers:");
+  // Step 5: Summary
+  console.log("=== DONE ===");
+  console.log(`Total profiles scraped: ${allProfiles.length}`);
+  console.log(`Total posts collected: ${allPosts.length}`);
+  console.log("\nTop 10 creators by followers:");
   summary
     .sort((a, b) => (b.followers || 0) - (a.followers || 0))
     .slice(0, 10)
@@ -97,4 +143,4 @@ async function scrapeHashtag() {
     });
 }
 
-scrapeHashtag().catch(console.error);
+main().catch(console.error);
