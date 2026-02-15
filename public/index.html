@@ -20,11 +20,11 @@
       border-bottom: 1px solid #e4e6eb; flex-wrap: wrap;
     }
     .stat-card {
-      flex: 1; min-width: 140px; padding: 16px; background: #f8f9fb;
+      flex: 1; min-width: 120px; padding: 16px; background: #f8f9fb;
       border-radius: 10px; text-align: center;
     }
-    .stat-card .value { font-size: 28px; font-weight: 700; color: #667eea; }
-    .stat-card .label { font-size: 12px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .stat-card .value { font-size: 24px; font-weight: 700; color: #667eea; }
+    .stat-card .label { font-size: 11px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
     .controls {
       display: flex; gap: 12px; padding: 16px 32px; align-items: center; flex-wrap: wrap;
@@ -38,6 +38,17 @@
       padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px;
       font-size: 14px; background: white; cursor: pointer;
     }
+
+    .filter-chips {
+      display: flex; gap: 8px; padding: 0 32px 8px; flex-wrap: wrap;
+    }
+    .chip {
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1px solid #ddd; background: white; transition: all 0.2s;
+    }
+    .chip:hover { border-color: #667eea; color: #667eea; }
+    .chip.active { background: #667eea; color: white; border-color: #667eea; }
+    .chip .count { font-size: 11px; opacity: 0.7; margin-left: 4px; }
 
     .grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -62,6 +73,15 @@
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 24px; font-weight: 700; flex-shrink: 0;
     }
+    .avatar-small {
+      width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+      border: 2px solid #667eea; flex-shrink: 0;
+    }
+    .avatar-fallback-small {
+      width: 36px; height: 36px; border-radius: 50%; background: #667eea;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
     .card-identity { flex: 1; min-width: 0; }
     .card-identity .username {
       font-size: 15px; font-weight: 600; color: #667eea;
@@ -75,6 +95,30 @@
     }
     .card-identity .fullname { font-size: 13px; color: #65676b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-identity .category { font-size: 11px; color: #8b5cf6; margin-top: 2px; }
+
+    .tier-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 6px;
+    }
+    .tier-macro { background: #fef3c7; color: #92400e; }
+    .tier-mid-tier { background: #dbeafe; color: #1e40af; }
+    .tier-micro { background: #d1fae5; color: #065f46; }
+    .tier-nano { background: #f3e8ff; color: #6b21a8; }
+
+    .niche-tags { padding: 0 20px 10px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .niche-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+      background: #f0f2f5; color: #65676b; font-weight: 500;
+    }
+
+    .campaign-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 6px;
+      vertical-align: middle;
+    }
+    .dot-not_contacted { background: #9ca3af; }
+    .dot-contacted { background: #f59e0b; }
+    .dot-confirmed { background: #3b82f6; }
+    .dot-content_posted { background: #10b981; }
 
     .card-bio {
       padding: 0 20px 14px; font-size: 13px; color: #444; line-height: 1.5;
@@ -133,10 +177,137 @@
       padding: 16px; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #6b5900;
     }
 
+    /* Revenue Projections */
+    .revenue-container {
+      max-width: 900px; margin: 32px auto; padding: 0 32px;
+    }
+    .revenue-container h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+    .calc-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    .calc-panel {
+      background: white; border-radius: 12px; padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .calc-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label {
+      display: block; font-size: 13px; font-weight: 500; color: #65676b; margin-bottom: 6px;
+    }
+    .input-group input[type="number"],
+    .input-group input[type="range"] {
+      width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; outline: none;
+    }
+    .input-group input[type="range"] { padding: 0; margin-top: 4px; }
+    .input-group .range-value { font-size: 14px; font-weight: 600; color: #667eea; float: right; }
+    .input-group input[type="number"]:focus { border-color: #667eea; }
+    .output-row {
+      display: flex; justify-content: space-between; padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0; font-size: 14px;
+    }
+    .output-row:last-child { border-bottom: none; }
+    .output-row .out-label { color: #65676b; }
+    .output-row .out-value { font-weight: 700; color: #1a1a2e; }
+    .output-row .out-value.revenue { color: #10b981; font-size: 18px; }
+    .progress-container { margin-top: 16px; }
+    .progress-bar-bg {
+      width: 100%; height: 24px; background: #f0f2f5; border-radius: 12px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #667eea, #10b981);
+      border-radius: 12px; transition: width 0.3s; min-width: 0;
+    }
+    .progress-label {
+      display: flex; justify-content: space-between; font-size: 12px; color: #65676b; margin-top: 4px;
+    }
+    .scenario-buttons {
+      display: flex; gap: 8px; margin-bottom: 20px;
+    }
+    .scenario-btn {
+      flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white;
+      font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .scenario-btn:hover { border-color: #667eea; color: #667eea; }
+    .scenario-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+    /* Campaign Tracker */
+    .campaign-container {
+      max-width: 1200px; margin: 24px auto; padding: 0 32px;
+    }
+    .campaign-container h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+    .pipeline-stats {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .pipeline-stat {
+      flex: 1; min-width: 150px; padding: 16px; background: white; border-radius: 10px;
+      text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .pipeline-stat .ps-value { font-size: 28px; font-weight: 700; }
+    .pipeline-stat .ps-label { font-size: 12px; color: #65676b; text-transform: uppercase; margin-top: 4px; }
+    .pipeline-stat .ps-pct { font-size: 11px; color: #667eea; margin-top: 2px; }
+    .ps-not_contacted .ps-value { color: #9ca3af; }
+    .ps-contacted .ps-value { color: #f59e0b; }
+    .ps-confirmed .ps-value { color: #3b82f6; }
+    .ps-content_posted .ps-value { color: #10b981; }
+
+    .pipeline-columns {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .pipeline-col {
+      background: #f8f9fb; border-radius: 12px; padding: 16px; min-height: 200px;
+    }
+    .pipeline-col-header {
+      font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e4e6eb;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pipeline-col-header .col-count {
+      background: #e4e6eb; padding: 2px 8px; border-radius: 10px; font-size: 12px;
+    }
+    .pipeline-card {
+      background: white; border-radius: 8px; padding: 12px; margin-bottom: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06); cursor: pointer; transition: box-shadow 0.2s;
+    }
+    .pipeline-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .pipeline-card-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pipeline-card .pc-info { flex: 1; min-width: 0; }
+    .pipeline-card .pc-username { font-size: 13px; font-weight: 600; color: #667eea; }
+    .pipeline-card .pc-followers { font-size: 11px; color: #65676b; }
+    .pipeline-card .pc-notes { font-size: 11px; color: #888; margin-top: 4px; font-style: italic; }
+    .pipeline-card select {
+      font-size: 11px; padding: 3px 6px; border: 1px solid #ddd; border-radius: 6px;
+      margin-top: 6px; width: 100%;
+    }
+    .pipeline-card textarea {
+      font-size: 11px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 6px;
+      margin-top: 4px; width: 100%; resize: vertical; min-height: 40px; font-family: inherit;
+    }
+    .pipeline-card .save-btn {
+      font-size: 11px; padding: 4px 10px; background: #667eea; color: white;
+      border: none; border-radius: 6px; cursor: pointer; margin-top: 4px;
+    }
+    .pipeline-card .save-btn:hover { background: #5a6fd6; }
+
+    /* Add to campaign button on creator cards */
+    .card-actions { padding: 0 20px 14px; }
+    .add-campaign-btn {
+      font-size: 12px; padding: 5px 12px; border: 1px solid #667eea; color: #667eea;
+      background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    }
+    .add-campaign-btn:hover { background: #667eea; color: white; }
+
+    @media (max-width: 900px) {
+      .calc-grid { grid-template-columns: 1fr; }
+      .pipeline-columns { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 600px) {
-      .header, .stats-bar, .controls, .grid, .tabs { padding-left: 16px; padding-right: 16px; }
+      .header, .stats-bar, .controls, .grid, .tabs, .filter-chips { padding-left: 16px; padding-right: 16px; }
       .grid { grid-template-columns: 1fr; }
-      .methodology { padding: 0 16px; }
+      .methodology, .revenue-container, .campaign-container { padding: 0 16px; }
+      .pipeline-columns { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -148,11 +319,17 @@
 
   <div class="tabs">
     <div class="tab active" data-tab="creators">Creators</div>
+    <div class="tab" data-tab="revenue">Revenue Projections</div>
+    <div class="tab" data-tab="campaigns">Campaign Tracker</div>
     <div class="tab" data-tab="methodology">How Engagement Works</div>
   </div>
 
+  <!-- Creators Tab -->
   <div id="tab-creators" class="tab-content active">
     <div class="stats-bar" id="stats-bar"></div>
+
+    <div class="filter-chips" id="tier-filters"></div>
+    <div class="filter-chips" id="niche-filters"></div>
 
     <div class="controls">
       <input type="text" id="search" placeholder="Search by username, name, or bio...">
@@ -172,6 +349,88 @@
     <div class="empty" id="empty" style="display:none">No creators match your search.</div>
   </div>
 
+  <!-- Revenue Projections Tab -->
+  <div id="tab-revenue" class="tab-content">
+    <div class="revenue-container">
+      <h2>Revenue Projection Calculator</h2>
+      <p style="color:#65676b; margin-bottom:20px; font-size:14px;">Model expected revenue from creator partnerships against the $10K subscription goal.</p>
+
+      <div class="scenario-buttons">
+        <button class="scenario-btn" data-scenario="conservative">Conservative</button>
+        <button class="scenario-btn active" data-scenario="moderate">Moderate</button>
+        <button class="scenario-btn" data-scenario="optimistic">Optimistic</button>
+      </div>
+
+      <div class="calc-grid">
+        <div class="calc-panel">
+          <h3>Inputs</h3>
+          <div class="input-group">
+            <label>Subscription Price ($) <span class="range-value" id="price-val">$9.99</span></label>
+            <input type="number" id="calc-price" value="9.99" min="0.99" step="0.01">
+          </div>
+          <div class="input-group">
+            <label>Number of Creator Partners <span class="range-value" id="partners-val">5</span></label>
+            <input type="range" id="calc-partners" min="1" max="20" value="5">
+          </div>
+          <div class="input-group">
+            <label>Avg Audience Reach per Creator <span class="range-value" id="reach-val">0</span></label>
+            <input type="number" id="calc-reach" value="0" min="0">
+          </div>
+          <div class="input-group">
+            <label>Content View Rate (%) <span class="range-value" id="viewrate-val">10%</span></label>
+            <input type="range" id="calc-viewrate" min="1" max="50" value="10">
+          </div>
+          <div class="input-group">
+            <label>Conversion Rate (%) <span class="range-value" id="convrate-val">5%</span></label>
+            <input type="range" id="calc-convrate" min="1" max="20" value="5">
+          </div>
+        </div>
+
+        <div class="calc-panel">
+          <h3>Projected Results</h3>
+          <div id="calc-output"></div>
+          <div class="progress-container">
+            <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Progress to $10K Goal</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="goal-progress" style="width:0%"></div>
+            </div>
+            <div class="progress-label">
+              <span id="goal-current">$0</span>
+              <span>$10,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign Tracker Tab -->
+  <div id="tab-campaigns" class="tab-content">
+    <div class="campaign-container">
+      <h2>Campaign Outreach Tracker</h2>
+      <div class="pipeline-stats" id="pipeline-stats"></div>
+      <div class="pipeline-columns" id="pipeline-columns">
+        <div class="pipeline-col" id="col-not_contacted">
+          <div class="pipeline-col-header">Not Contacted <span class="col-count" id="count-not_contacted">0</span></div>
+          <div class="pipeline-list" id="list-not_contacted"></div>
+        </div>
+        <div class="pipeline-col" id="col-contacted">
+          <div class="pipeline-col-header">Contacted <span class="col-count" id="count-contacted">0</span></div>
+          <div class="pipeline-list" id="list-contacted"></div>
+        </div>
+        <div class="pipeline-col" id="col-confirmed">
+          <div class="pipeline-col-header">Confirmed <span class="col-count" id="count-confirmed">0</span></div>
+          <div class="pipeline-list" id="list-confirmed"></div>
+        </div>
+        <div class="pipeline-col" id="col-content_posted">
+          <div class="pipeline-col-header">Content Posted <span class="col-count" id="count-content_posted">0</span></div>
+          <div class="pipeline-list" id="list-content_posted"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How Engagement Works Tab -->
   <div id="tab-methodology" class="tab-content">
     <div class="methodology">
       <h2>Understanding Engagement Rate</h2>
@@ -216,6 +475,9 @@
 
   <script>
     let creators = [];
+    let campaignStatuses = {};
+    let activeTierFilter = 'all';
+    let activeNicheFilter = 'all';
 
     function formatNum(n) {
       if (n == null) return '0';
@@ -224,26 +486,106 @@
       return n.toLocaleString();
     }
 
+    function formatMoney(n) {
+      return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ========== STATS BAR ==========
     function renderStats(stats, creators) {
       const engagementRates = creators.filter(c => c.engagement_rate > 0).map(c => c.engagement_rate);
       const avgEngagement = engagementRates.length
         ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(2)
         : '0';
+
+      const tierCounts = { macro: 0, 'mid-tier': 0, micro: 0, nano: 0 };
+      creators.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
+
       document.getElementById('stats-bar').innerHTML = `
         <div class="stat-card"><div class="value">${stats.total_creators}</div><div class="label">Creators</div></div>
         <div class="stat-card"><div class="value">${formatNum(stats.total_followers)}</div><div class="label">Total Reach</div></div>
         <div class="stat-card"><div class="value">${formatNum(stats.avg_followers)}</div><div class="label">Avg Followers</div></div>
         <div class="stat-card"><div class="value">${avgEngagement}%</div><div class="label">Avg Engagement</div></div>
-        <div class="stat-card"><div class="value">${stats.verified_count}</div><div class="label">Verified</div></div>
-        <div class="stat-card"><div class="value">${formatNum(stats.total_posts)}</div><div class="label">Total Posts</div></div>
+        <div class="stat-card"><div class="value">${tierCounts.macro}</div><div class="label">Macro (200K+)</div></div>
+        <div class="stat-card"><div class="value">${tierCounts['mid-tier']}</div><div class="label">Mid-tier</div></div>
+        <div class="stat-card"><div class="value">${tierCounts.micro}</div><div class="label">Micro</div></div>
+        <div class="stat-card"><div class="value">${tierCounts.nano}</div><div class="label">Nano</div></div>
       `;
     }
 
+    // ========== FILTER CHIPS ==========
+    function renderFilterChips() {
+      const tierCounts = { macro: 0, 'mid-tier': 0, micro: 0, nano: 0 };
+      creators.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
+
+      const tierLabels = {
+        all: 'All',
+        macro: 'Macro (200K+)',
+        'mid-tier': 'Mid-tier (50K-200K)',
+        micro: 'Micro (10K-50K)',
+        nano: 'Nano (<10K)'
+      };
+
+      let tierHtml = '';
+      for (const [key, label] of Object.entries(tierLabels)) {
+        const count = key === 'all' ? creators.length : tierCounts[key];
+        const activeClass = activeTierFilter === key ? 'active' : '';
+        tierHtml += `<div class="chip ${activeClass}" data-tier="${key}">${label}<span class="count">(${count})</span></div>`;
+      }
+      document.getElementById('tier-filters').innerHTML = tierHtml;
+
+      // Niche chips
+      const nicheCounts = {};
+      creators.forEach(c => {
+        (c.niches || []).forEach(n => { nicheCounts[n] = (nicheCounts[n] || 0) + 1; });
+      });
+      const sortedNiches = Object.entries(nicheCounts).sort((a, b) => b[1] - a[1]);
+
+      let nicheHtml = `<div class="chip ${activeNicheFilter === 'all' ? 'active' : ''}" data-niche="all">All Niches</div>`;
+      for (const [niche, count] of sortedNiches) {
+        const activeClass = activeNicheFilter === niche ? 'active' : '';
+        nicheHtml += `<div class="chip ${activeClass}" data-niche="${niche}">${niche}<span class="count">(${count})</span></div>`;
+      }
+      document.getElementById('niche-filters').innerHTML = nicheHtml;
+
+      // Attach events
+      document.querySelectorAll('[data-tier]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          activeTierFilter = chip.dataset.tier;
+          renderFilterChips();
+          render();
+        });
+      });
+      document.querySelectorAll('[data-niche]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          activeNicheFilter = chip.dataset.niche;
+          renderFilterChips();
+          render();
+        });
+      });
+    }
+
+    // ========== CREATOR CARDS ==========
     function renderCard(c) {
       const avatarHtml = `<img class="avatar" src="/avatars/${c.username}.jpg" alt="${c.username}" onerror="this.outerHTML='<div class=\\'avatar-fallback\\'>${c.username[0].toUpperCase()}</div>'">`;
       const verifiedHtml = c.is_verified ? '<span class="verified-badge">&#10003;</span>' : '';
       const categoryHtml = c.business_category ? `<div class="category">${c.business_category}</div>` : '';
       const bio = c.biography || '';
+
+      const tierClass = c.tier ? `tier-${c.tier}` : '';
+      const tierLabel = c.tier ? c.tier.replace('-', ' ') : '';
+      const tierHtml = c.tier ? `<span class="tier-badge ${tierClass}">${tierLabel}</span>` : '';
+
+      const campaignStatus = campaignStatuses[c.username];
+      const dotHtml = campaignStatus ? `<span class="campaign-dot dot-${campaignStatus}" title="${campaignStatus.replace('_', ' ')}"></span>` : '';
+
+      const nichesHtml = (c.niches && c.niches.length > 0)
+        ? `<div class="niche-tags">${c.niches.map(n => `<span class="niche-tag">${n}</span>`).join('')}</div>`
+        : '';
+
+      const inCampaign = campaignStatuses[c.username];
+      const actionHtml = !inCampaign
+        ? `<div class="card-actions"><button class="add-campaign-btn" data-username="${c.username}">+ Add to Campaign</button></div>`
+        : '';
 
       return `
         <div class="card">
@@ -253,11 +595,14 @@
               <a class="username" href="https://www.instagram.com/${c.username}/" target="_blank" rel="noopener">
                 @${c.username} ${verifiedHtml}
               </a>
+              ${tierHtml}${dotHtml}
               <div class="fullname">${c.full_name || ''}</div>
               ${categoryHtml}
             </div>
           </div>
           ${bio ? `<div class="card-bio">${bio.replace(/\n/g, '<br>')}</div>` : ''}
+          ${nichesHtml}
+          ${actionHtml}
           <div class="card-stats">
             <div class="card-stat"><div class="num">${formatNum(c.followers)}</div><div class="lbl">Followers</div></div>
             <div class="card-stat"><div class="num">${formatNum(c.following)}</div><div class="lbl">Following</div></div>
@@ -272,11 +617,14 @@
       const q = document.getElementById('search').value.toLowerCase();
       const sort = document.getElementById('sort').value;
 
-      let filtered = creators.filter(c =>
-        c.username.toLowerCase().includes(q) ||
-        (c.full_name || '').toLowerCase().includes(q) ||
-        (c.biography || '').toLowerCase().includes(q)
-      );
+      let filtered = creators.filter(c => {
+        const matchesSearch = c.username.toLowerCase().includes(q) ||
+          (c.full_name || '').toLowerCase().includes(q) ||
+          (c.biography || '').toLowerCase().includes(q);
+        const matchesTier = activeTierFilter === 'all' || c.tier === activeTierFilter;
+        const matchesNiche = activeNicheFilter === 'all' || (c.niches && c.niches.includes(activeNicheFilter));
+        return matchesSearch && matchesTier && matchesNiche;
+      });
 
       const [field, dir] = sort.split('-');
       filtered.sort((a, b) => {
@@ -305,8 +653,170 @@
         empty.style.display = 'none';
         grid.innerHTML = filtered.map(renderCard).join('');
       }
+
+      // Attach add-to-campaign buttons
+      document.querySelectorAll('.add-campaign-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const username = btn.dataset.username;
+          await fetch(`/api/campaigns/${username}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'not_contacted', notes: '' })
+          });
+          campaignStatuses[username] = 'not_contacted';
+          render();
+          loadCampaigns();
+        });
+      });
     }
 
+    // ========== REVENUE CALCULATOR ==========
+    const scenarios = {
+      conservative: { viewrate: 5, convrate: 2, partners: 3 },
+      moderate: { viewrate: 10, convrate: 5, partners: 5 },
+      optimistic: { viewrate: 20, convrate: 8, partners: 10 }
+    };
+
+    function updateCalc() {
+      const price = parseFloat(document.getElementById('calc-price').value) || 0;
+      const partners = parseInt(document.getElementById('calc-partners').value) || 0;
+      const reach = parseInt(document.getElementById('calc-reach').value) || 0;
+      const viewrate = parseInt(document.getElementById('calc-viewrate').value) || 0;
+      const convrate = parseInt(document.getElementById('calc-convrate').value) || 0;
+
+      document.getElementById('price-val').textContent = formatMoney(price);
+      document.getElementById('partners-val').textContent = partners;
+      document.getElementById('reach-val').textContent = formatNum(reach);
+      document.getElementById('viewrate-val').textContent = viewrate + '%';
+      document.getElementById('convrate-val').textContent = convrate + '%';
+
+      const totalReach = partners * reach;
+      const pageVisits = Math.round(totalReach * (viewrate / 100));
+      const conversions = Math.round(pageVisits * (convrate / 100));
+      const revenue = conversions * price;
+      const budget = 2000;
+      const efficiency = budget > 0 ? (revenue / budget).toFixed(2) : 0;
+      const goalPct = Math.min(100, (revenue / 10000) * 100);
+
+      document.getElementById('calc-output').innerHTML = `
+        <div class="output-row"><span class="out-label">Total Audience Reach</span><span class="out-value">${formatNum(totalReach)}</span></div>
+        <div class="output-row"><span class="out-label">Estimated Page Visits</span><span class="out-value">${formatNum(pageVisits)}</span></div>
+        <div class="output-row"><span class="out-label">Estimated Conversions</span><span class="out-value">${formatNum(conversions)}</span></div>
+        <div class="output-row"><span class="out-label">Projected Revenue</span><span class="out-value revenue">${formatMoney(revenue)}</span></div>
+        <div class="output-row"><span class="out-label">Budget Efficiency</span><span class="out-value">${efficiency}x per $1 spent</span></div>
+      `;
+
+      document.getElementById('goal-progress').style.width = goalPct + '%';
+      document.getElementById('goal-current').textContent = formatMoney(revenue);
+    }
+
+    function setScenario(name) {
+      const s = scenarios[name];
+      document.getElementById('calc-viewrate').value = s.viewrate;
+      document.getElementById('calc-convrate').value = s.convrate;
+      document.getElementById('calc-partners').value = s.partners;
+      document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-scenario="${name}"]`).classList.add('active');
+      updateCalc();
+    }
+
+    document.querySelectorAll('.scenario-btn').forEach(btn => {
+      btn.addEventListener('click', () => setScenario(btn.dataset.scenario));
+    });
+
+    ['calc-price', 'calc-partners', 'calc-reach', 'calc-viewrate', 'calc-convrate'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+        updateCalc();
+      });
+    });
+
+    // ========== CAMPAIGN TRACKER ==========
+    let allCampaigns = [];
+
+    async function loadCampaigns() {
+      const [campaigns, stats] = await Promise.all([
+        fetch('/api/campaigns').then(r => r.json()),
+        fetch('/api/campaigns/stats').then(r => r.json())
+      ]);
+      allCampaigns = campaigns;
+
+      // Update campaignStatuses lookup
+      campaignStatuses = {};
+      campaigns.forEach(c => { campaignStatuses[c.username] = c.status; });
+
+      // Pipeline stats
+      const total = stats.total || 1;
+      document.getElementById('pipeline-stats').innerHTML = `
+        <div class="pipeline-stat ps-not_contacted">
+          <div class="ps-value">${stats.not_contacted}</div>
+          <div class="ps-label">Not Contacted</div>
+          <div class="ps-pct">${total > 0 ? Math.round(stats.not_contacted / total * 100) : 0}%</div>
+        </div>
+        <div class="pipeline-stat ps-contacted">
+          <div class="ps-value">${stats.contacted}</div>
+          <div class="ps-label">Contacted</div>
+          <div class="ps-pct">${total > 0 ? Math.round(stats.contacted / total * 100) : 0}%</div>
+        </div>
+        <div class="pipeline-stat ps-confirmed">
+          <div class="ps-value">${stats.confirmed}</div>
+          <div class="ps-label">Confirmed</div>
+          <div class="ps-pct">${total > 0 ? Math.round(stats.confirmed / total * 100) : 0}%</div>
+        </div>
+        <div class="pipeline-stat ps-content_posted">
+          <div class="ps-value">${stats.content_posted}</div>
+          <div class="ps-label">Content Posted</div>
+          <div class="ps-pct">${total > 0 ? Math.round(stats.content_posted / total * 100) : 0}%</div>
+        </div>
+      `;
+
+      // Pipeline columns
+      const statuses = ['not_contacted', 'contacted', 'confirmed', 'content_posted'];
+      const statusLabels = { not_contacted: 'Not Contacted', contacted: 'Contacted', confirmed: 'Confirmed', content_posted: 'Content Posted' };
+      statuses.forEach(status => {
+        const items = campaigns.filter(c => c.status === status);
+        document.getElementById(`count-${status}`).textContent = items.length;
+        document.getElementById(`list-${status}`).innerHTML = items.map(c => {
+          const avatarHtml = `<img class="avatar-small" src="/avatars/${c.username}.jpg" onerror="this.outerHTML='<div class=\\'avatar-fallback-small\\'>${c.username[0].toUpperCase()}</div>'">`;
+          return `
+            <div class="pipeline-card" data-username="${c.username}">
+              <div class="pipeline-card-row">
+                ${avatarHtml}
+                <div class="pc-info">
+                  <div class="pc-username">@${c.username}</div>
+                  <div class="pc-followers">${formatNum(c.followers)} followers</div>
+                </div>
+              </div>
+              ${c.notes ? `<div class="pc-notes">${c.notes}</div>` : ''}
+              <select class="status-select" data-username="${c.username}">
+                ${statuses.map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${statusLabels[s]}</option>`).join('')}
+              </select>
+              <textarea class="notes-input" data-username="${c.username}" placeholder="Add notes...">${c.notes || ''}</textarea>
+              <button class="save-btn" data-username="${c.username}">Save</button>
+            </div>
+          `;
+        }).join('');
+      });
+
+      // Attach save events
+      document.querySelectorAll('.pipeline-card .save-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const username = btn.dataset.username;
+          const card = btn.closest('.pipeline-card');
+          const newStatus = card.querySelector('.status-select').value;
+          const notes = card.querySelector('.notes-input').value;
+          await fetch(`/api/campaigns/${username}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus, notes })
+          });
+          loadCampaigns();
+          render();
+        });
+      });
+    }
+
+    // ========== TABS ==========
     document.getElementById('search').addEventListener('input', render);
     document.getElementById('sort').addEventListener('change', render);
 
@@ -316,17 +826,30 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'campaigns') loadCampaigns();
       });
     });
 
+    // ========== INIT ==========
     async function init() {
-      const [creatorsRes, statsRes] = await Promise.all([
+      const [creatorsRes, statsRes, campaignsRes] = await Promise.all([
         fetch('/api/creators').then(r => r.json()),
         fetch('/api/stats').then(r => r.json()),
+        fetch('/api/campaigns').then(r => r.json()),
       ]);
       creators = creatorsRes;
+      campaignsRes.forEach(c => { campaignStatuses[c.username] = c.status; });
+
       renderStats(statsRes, creators);
+      renderFilterChips();
       render();
+
+      // Auto-fill average reach for revenue calculator
+      if (creators.length > 0) {
+        const avgReach = Math.round(creators.reduce((sum, c) => sum + c.followers, 0) / creators.length);
+        document.getElementById('calc-reach').value = avgReach;
+      }
+      updateCalc();
     }
 
     init();

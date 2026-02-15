@@ -40,6 +40,13 @@ db.exec(`
     display_url TEXT,
     FOREIGN KEY (creator_username) REFERENCES creators(username)
   );
+
+  CREATE TABLE IF NOT EXISTS campaigns (
+    username TEXT PRIMARY KEY REFERENCES creators(username),
+    status TEXT DEFAULT 'not_contacted',
+    notes TEXT DEFAULT '',
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 const upsertCreatorStmt = db.prepare(`
@@ -106,19 +113,51 @@ function getAllCreators() {
   return db.prepare("SELECT * FROM creators ORDER BY followers DESC").all();
 }
 
+const NICHE_KEYWORDS = {
+  'AI': ['ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'gpt', 'neural'],
+  'Video': ['video', 'film', 'filmmaker', 'cinema', 'vfx', 'animation', 'motion'],
+  'Design': ['design', 'designer', 'graphic', 'ui', 'ux', 'illustration', 'illustrator'],
+  'Fashion': ['fashion', 'style', 'stylist', 'model', 'outfit', 'clothing', 'beauty'],
+  'Marketing': ['marketing', 'growth', 'brand', 'ads', 'social media', 'digital marketing'],
+  'Creator': ['creator', 'content creator', 'influencer', 'creative'],
+  'Photography': ['photo', 'photographer', 'photography', 'portrait', 'landscape'],
+  'Music': ['music', 'musician', 'producer', 'dj', 'singer', 'songwriter'],
+  'Tech': ['tech', 'developer', 'software', 'coding', 'programming', 'startup', 'saas'],
+  'Fitness': ['fitness', 'gym', 'workout', 'health', 'nutrition', 'wellness', 'yoga'],
+};
+
+function extractNiches(biography) {
+  if (!biography) return [];
+  const bio = biography.toLowerCase();
+  const niches = [];
+  for (const [niche, keywords] of Object.entries(NICHE_KEYWORDS)) {
+    if (keywords.some(kw => bio.includes(kw))) {
+      niches.push(niche);
+    }
+  }
+  return niches;
+}
+
 function getCreatorsWithEngagement() {
-  return db.prepare(`
+  const rows = db.prepare(`
     SELECT c.*,
       COALESCE(SUM(p.likes_count), 0) as total_likes,
       COALESCE(SUM(p.comments_count), 0) as total_comments,
       CASE WHEN c.followers > 0
         THEN ROUND((COALESCE(SUM(p.likes_count), 0) + COALESCE(SUM(p.comments_count), 0)) * 100.0 / c.followers, 2)
-        ELSE 0 END as engagement_rate
+        ELSE 0 END as engagement_rate,
+      CASE
+        WHEN c.followers >= 200000 THEN 'macro'
+        WHEN c.followers >= 50000 THEN 'mid-tier'
+        WHEN c.followers >= 10000 THEN 'micro'
+        ELSE 'nano'
+      END as tier
     FROM creators c
     LEFT JOIN posts p ON c.username = p.creator_username
     GROUP BY c.username
     ORDER BY c.followers DESC
   `).all();
+  return rows.map(row => ({ ...row, niches: extractNiches(row.biography) }));
 }
 
 function getCreatorByUsername(username) {
@@ -146,6 +185,40 @@ function getStats() {
     .get();
 }
 
+function getCampaignStatus(username) {
+  return db.prepare("SELECT * FROM campaigns WHERE username = ?").get(username);
+}
+
+function updateCampaignStatus(username, status, notes) {
+  db.prepare(`
+    INSERT INTO campaigns (username, status, notes, updated_at)
+    VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(username) DO UPDATE SET
+      status = ?, notes = ?, updated_at = datetime('now')
+  `).run(username, status, notes || '', status, notes || '');
+}
+
+function getAllCampaignStatuses() {
+  return db.prepare(`
+    SELECT cam.*, c.full_name, c.followers, c.profile_pic_url
+    FROM campaigns cam
+    JOIN creators c ON cam.username = c.username
+    ORDER BY cam.updated_at DESC
+  `).all();
+}
+
+function getCampaignStats() {
+  return db.prepare(`
+    SELECT
+      COALESCE(SUM(CASE WHEN status = 'not_contacted' THEN 1 ELSE 0 END), 0) as not_contacted,
+      COALESCE(SUM(CASE WHEN status = 'contacted' THEN 1 ELSE 0 END), 0) as contacted,
+      COALESCE(SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END), 0) as confirmed,
+      COALESCE(SUM(CASE WHEN status = 'content_posted' THEN 1 ELSE 0 END), 0) as content_posted,
+      COUNT(*) as total
+    FROM campaigns
+  `).get();
+}
+
 module.exports = {
   db,
   upsertCreator,
@@ -155,4 +228,8 @@ module.exports = {
   getCreatorByUsername,
   getPostsByCreator,
   getStats,
+  getCampaignStatus,
+  updateCampaignStatus,
+  getAllCampaignStatuses,
+  getCampaignStats,
 };
