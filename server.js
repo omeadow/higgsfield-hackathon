@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.get("/diagram.jpg", (req, res) => { res.sendFile(path.join(__dirname, "diagram.jpg")); });
 app.use("/avatars", express.static(path.join(__dirname, "data", "avatars")));
 app.use("/yt-avatars", express.static(path.join(__dirname, "data", "yt_avatars")));
 
