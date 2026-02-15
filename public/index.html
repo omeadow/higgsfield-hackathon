@@ -94,9 +94,49 @@
 
     .empty { text-align: center; padding: 60px 32px; color: #65676b; font-size: 16px; }
 
+    .tabs {
+      display: flex; gap: 0; background: white; border-bottom: 2px solid #e4e6eb;
+      padding: 0 32px;
+    }
+    .tab {
+      padding: 14px 24px; font-size: 14px; font-weight: 600; color: #65676b;
+      cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
+      transition: color 0.2s;
+    }
+    .tab:hover { color: #667eea; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .methodology {
+      max-width: 760px; margin: 32px auto; padding: 0 32px;
+    }
+    .methodology h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #1a1a2e; }
+    .methodology h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; color: #1a1a2e; }
+    .methodology p { font-size: 15px; line-height: 1.7; color: #444; margin-bottom: 12px; }
+    .formula-box {
+      background: linear-gradient(135deg, #667eea15, #764ba215);
+      border: 1px solid #667eea30; border-radius: 10px;
+      padding: 24px; text-align: center; margin: 20px 0;
+    }
+    .formula-box .formula { font-size: 18px; font-weight: 700; color: #667eea; font-family: monospace; }
+    .formula-box .formula-note { font-size: 13px; color: #65676b; margin-top: 8px; }
+    .scale-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .scale-table th, .scale-table td {
+      padding: 10px 16px; text-align: left; border-bottom: 1px solid #e4e6eb; font-size: 14px;
+    }
+    .scale-table th { font-weight: 600; color: #65676b; font-size: 12px; text-transform: uppercase; }
+    .scale-table .rate { font-weight: 700; color: #667eea; }
+    .note-box {
+      background: #fff8e6; border: 1px solid #f0d060; border-radius: 8px;
+      padding: 16px; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #6b5900;
+    }
+
     @media (max-width: 600px) {
-      .header, .stats-bar, .controls, .grid { padding-left: 16px; padding-right: 16px; }
+      .header, .stats-bar, .controls, .grid, .tabs { padding-left: 16px; padding-right: 16px; }
       .grid { grid-template-columns: 1fr; }
+      .methodology { padding: 0 16px; }
     }
   </style>
 </head>
@@ -106,24 +146,73 @@
     <p>Instagram creators using the #higgsfield hashtag</p>
   </div>
 
-  <div class="stats-bar" id="stats-bar"></div>
-
-  <div class="controls">
-    <input type="text" id="search" placeholder="Search by username, name, or bio...">
-    <select id="sort">
-      <option value="followers-desc">Followers (High to Low)</option>
-      <option value="followers-asc">Followers (Low to High)</option>
-      <option value="posts-desc">Posts (High to Low)</option>
-      <option value="posts-asc">Posts (Low to High)</option>
-      <option value="engagement-desc">Engagement (High to Low)</option>
-      <option value="engagement-asc">Engagement (Low to High)</option>
-      <option value="name-asc">Name (A-Z)</option>
-      <option value="name-desc">Name (Z-A)</option>
-    </select>
+  <div class="tabs">
+    <div class="tab active" data-tab="creators">Creators</div>
+    <div class="tab" data-tab="methodology">How Engagement Works</div>
   </div>
 
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none">No creators match your search.</div>
+  <div id="tab-creators" class="tab-content active">
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search by username, name, or bio...">
+      <select id="sort">
+        <option value="followers-desc">Followers (High to Low)</option>
+        <option value="followers-asc">Followers (Low to High)</option>
+        <option value="posts-desc">Posts (High to Low)</option>
+        <option value="posts-asc">Posts (Low to High)</option>
+        <option value="engagement-desc">Engagement (High to Low)</option>
+        <option value="engagement-asc">Engagement (Low to High)</option>
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+      </select>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none">No creators match your search.</div>
+  </div>
+
+  <div id="tab-methodology" class="tab-content">
+    <div class="methodology">
+      <h2>Understanding Engagement Rate</h2>
+
+      <p>Engagement rate measures how actively a creator's audience interacts with their content. Instead of just looking at how many followers someone has, engagement rate tells you how many of those followers actually pay attention.</p>
+
+      <h3>The Formula</h3>
+      <div class="formula-box">
+        <div class="formula">(Likes + Comments) / Followers &times; 100</div>
+        <div class="formula-note">Result is shown as a percentage</div>
+      </div>
+
+      <p>We add up all the likes and comments across a creator's recent posts, then divide by their follower count. The result is multiplied by 100 to express it as a percentage.</p>
+
+      <p><strong>For example:</strong> if a creator has 10,000 followers and their recent posts received a total of 1,500 likes and 200 comments, their engagement rate would be:</p>
+      <div class="formula-box">
+        <div class="formula">(1,500 + 200) / 10,000 &times; 100 = 17%</div>
+      </div>
+
+      <h3>What the Numbers Mean</h3>
+      <table class="scale-table">
+        <thead>
+          <tr><th>Engagement Rate</th><th>What It Means</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rate">Less than 1%</td><td>Low engagement &mdash; the audience is mostly passive or the account may have inflated follower counts</td></tr>
+          <tr><td class="rate">1% &ndash; 3%</td><td>Average &mdash; typical for larger accounts where a smaller share of followers interact</td></tr>
+          <tr><td class="rate">3% &ndash; 6%</td><td>Good &mdash; the creator has a responsive, interested audience</td></tr>
+          <tr><td class="rate">Above 6%</td><td>Excellent &mdash; strong community connection, common with smaller or niche creators</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Why It Matters</h3>
+      <p>A creator with 5,000 followers and a 10% engagement rate may be more valuable for partnerships than one with 100,000 followers and a 0.5% rate. High engagement means the audience trusts the creator and is likely to act on their recommendations.</p>
+
+      <h3>What's Not Included</h3>
+      <div class="note-box">
+        The full engagement formula ideally includes <strong>shares</strong> and <strong>saves</strong> in addition to likes and comments. However, Instagram does not make share and save counts publicly available &mdash; only the account owner can see those numbers. Our calculation uses the two metrics that are publicly accessible: likes and comments.
+      </div>
+    </div>
+  </div>
 
   <script>
     let creators = [];
@@ -220,6 +309,15 @@
 
     document.getElementById('search').addEventListener('input', render);
     document.getElementById('sort').addEventListener('change', render);
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
 
     async function init() {
       const [creatorsRes, statsRes] = await Promise.all([
