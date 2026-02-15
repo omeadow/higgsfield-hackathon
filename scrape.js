@@ -1,6 +1,8 @@
 require("dotenv").config();
 const { ApifyClient } = require("apify-client");
 const fs = require("fs");
+const { upsertCreator, upsertPost } = require("./db");
+const { downloadAvatar } = require("./avatars");
 
 const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
 
@@ -68,7 +70,24 @@ async function scrapeHashtag() {
     JSON.stringify(summary, null, 2)
   );
 
-  console.log("Done! Results saved to data/");
+  // Step 5: Save to database
+  console.log("Saving to database...");
+  for (const profile of profiles) {
+    upsertCreator(profile);
+    if (profile.latestPosts) {
+      for (const post of profile.latestPosts) {
+        upsertPost(post, profile.username);
+      }
+    }
+  }
+
+  // Step 6: Download avatars
+  console.log("Downloading avatars...");
+  await Promise.all(
+    profiles.map((p) => downloadAvatar(p.username, p.profilePicUrl))
+  );
+
+  console.log("Done! Results saved to data/ and database");
   console.log("\nTop creators by followers:");
   summary
     .sort((a, b) => (b.followers || 0) - (a.followers || 0))

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>#higgsfield Creator Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; padding: 24px 32px;
+    }
+    .header h1 { font-size: 24px; font-weight: 700; }
+    .header p { opacity: 0.85; margin-top: 4px; font-size: 14px; }
+
+    .stats-bar {
+      display: flex; gap: 16px; padding: 20px 32px; background: white;
+      border-bottom: 1px solid #e4e6eb; flex-wrap: wrap;
+    }
+    .stat-card {
+      flex: 1; min-width: 140px; padding: 16px; background: #f8f9fb;
+      border-radius: 10px; text-align: center;
+    }
+    .stat-card .value { font-size: 28px; font-weight: 700; color: #667eea; }
+    .stat-card .label { font-size: 12px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+    .controls {
+      display: flex; gap: 12px; padding: 16px 32px; align-items: center; flex-wrap: wrap;
+    }
+    .controls input {
+      flex: 1; min-width: 200px; padding: 10px 16px; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 14px; outline: none;
+    }
+    .controls input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
+    .controls select {
+      padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; background: white; cursor: pointer;
+    }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px; padding: 16px 32px 32px;
+    }
+
+    .card {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); transform: translateY(-2px); }
+
+    .card-header {
+      display: flex; align-items: center; gap: 14px; padding: 20px;
+    }
+    .avatar {
+      width: 60px; height: 60px; border-radius: 50%; object-fit: cover;
+      border: 3px solid #667eea; flex-shrink: 0;
+    }
+    .avatar-fallback {
+      width: 60px; height: 60px; border-radius: 50%; background: #667eea;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 24px; font-weight: 700; flex-shrink: 0;
+    }
+    .card-identity { flex: 1; min-width: 0; }
+    .card-identity .username {
+      font-size: 15px; font-weight: 600; color: #667eea;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .card-identity .username:hover { text-decoration: underline; }
+    .verified-badge {
+      display: inline-block; width: 16px; height: 16px; background: #667eea;
+      border-radius: 50%; color: white; font-size: 10px; text-align: center;
+      line-height: 16px;
+    }
+    .card-identity .fullname { font-size: 13px; color: #65676b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-identity .category { font-size: 11px; color: #8b5cf6; margin-top: 2px; }
+
+    .card-bio {
+      padding: 0 20px 14px; font-size: 13px; color: #444; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .card-stats {
+      display: flex; border-top: 1px solid #f0f0f0; padding: 0;
+    }
+    .card-stat {
+      flex: 1; text-align: center; padding: 14px 8px;
+      border-right: 1px solid #f0f0f0;
+    }
+    .card-stat:last-child { border-right: none; }
+    .card-stat .num { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .card-stat .lbl { font-size: 11px; color: #65676b; text-transform: uppercase; margin-top: 2px; }
+
+    .empty { text-align: center; padding: 60px 32px; color: #65676b; font-size: 16px; }
+
+    @media (max-width: 600px) {
+      .header, .stats-bar, .controls, .grid { padding-left: 16px; padding-right: 16px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>#higgsfield Creator Dashboard</h1>
+    <p>Instagram creators using the #higgsfield hashtag</p>
+  </div>
+
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search by username, name, or bio...">
+    <select id="sort">
+      <option value="followers-desc">Followers (High to Low)</option>
+      <option value="followers-asc">Followers (Low to High)</option>
+      <option value="posts-desc">Posts (High to Low)</option>
+      <option value="posts-asc">Posts (Low to High)</option>
+      <option value="name-asc">Name (A-Z)</option>
+      <option value="name-desc">Name (Z-A)</option>
+    </select>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">No creators match your search.</div>
+
+  <script>
+    let creators = [];
+
+    function formatNum(n) {
+      if (n == null) return '0';
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      return n.toLocaleString();
+    }
+
+    function renderStats(stats) {
+      document.getElementById('stats-bar').innerHTML = `
+        <div class="stat-card"><div class="value">${stats.total_creators}</div><div class="label">Creators</div></div>
+        <div class="stat-card"><div class="value">${formatNum(stats.total_followers)}</div><div class="label">Total Reach</div></div>
+        <div class="stat-card"><div class="value">${formatNum(stats.avg_followers)}</div><div class="label">Avg Followers</div></div>
+        <div class="stat-card"><div class="value">${formatNum(stats.max_followers)}</div><div class="label">Top Followers</div></div>
+        <div class="stat-card"><div class="value">${stats.verified_count}</div><div class="label">Verified</div></div>
+        <div class="stat-card"><div class="value">${formatNum(stats.total_posts)}</div><div class="label">Total Posts</div></div>
+      `;
+    }
+
+    function renderCard(c) {
+      const avatarHtml = `<img class="avatar" src="/avatars/${c.username}.jpg" alt="${c.username}" onerror="this.outerHTML='<div class=\\'avatar-fallback\\'>${c.username[0].toUpperCase()}</div>'">`;
+      const verifiedHtml = c.is_verified ? '<span class="verified-badge">&#10003;</span>' : '';
+      const categoryHtml = c.business_category ? `<div class="category">${c.business_category}</div>` : '';
+      const bio = c.biography || '';
+
+      return `
+        <div class="card">
+          <div class="card-header">
+            ${avatarHtml}
+            <div class="card-identity">
+              <a class="username" href="https://www.instagram.com/${c.username}/" target="_blank" rel="noopener">
+                @${c.username} ${verifiedHtml}
+              </a>
+              <div class="fullname">${c.full_name || ''}</div>
+              ${categoryHtml}
+            </div>
+          </div>
+          ${bio ? `<div class="card-bio">${bio.replace(/\n/g, '<br>')}</div>` : ''}
+          <div class="card-stats">
+            <div class="card-stat"><div class="num">${formatNum(c.followers)}</div><div class="lbl">Followers</div></div>
+            <div class="card-stat"><div class="num">${formatNum(c.following)}</div><div class="lbl">Following</div></div>
+            <div class="card-stat"><div class="num">${formatNum(c.posts_count)}</div><div class="lbl">Posts</div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const sort = document.getElementById('sort').value;
+
+      let filtered = creators.filter(c =>
+        c.username.toLowerCase().includes(q) ||
+        (c.full_name || '').toLowerCase().includes(q) ||
+        (c.biography || '').toLowerCase().includes(q)
+      );
+
+      const [field, dir] = sort.split('-');
+      filtered.sort((a, b) => {
+        let va, vb;
+        if (field === 'followers') { va = a.followers; vb = b.followers; }
+        else if (field === 'posts') { va = a.posts_count; vb = b.posts_count; }
+        else { va = (a.full_name || a.username).toLowerCase(); vb = (b.full_name || b.username).toLowerCase(); }
+
+        if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        return dir === 'asc' ? va - vb : vb - va;
+      });
+
+      return filtered;
+    }
+
+    function render() {
+      const filtered = getFiltered();
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        grid.innerHTML = filtered.map(renderCard).join('');
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', render);
+    document.getElementById('sort').addEventListener('change', render);
+
+    async function init() {
+      const [creatorsRes, statsRes] = await Promise.all([
+        fetch('/api/creators').then(r => r.json()),
+        fetch('/api/stats').then(r => r.json()),
+      ]);
+      creators = creatorsRes;
+      renderStats(statsRes);
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>
