@@ -106,6 +106,21 @@ function getAllCreators() {
   return db.prepare("SELECT * FROM creators ORDER BY followers DESC").all();
 }
 
+function getCreatorsWithEngagement() {
+  return db.prepare(`
+    SELECT c.*,
+      COALESCE(SUM(p.likes_count), 0) as total_likes,
+      COALESCE(SUM(p.comments_count), 0) as total_comments,
+      CASE WHEN c.followers > 0
+        THEN ROUND((COALESCE(SUM(p.likes_count), 0) + COALESCE(SUM(p.comments_count), 0)) * 100.0 / c.followers, 2)
+        ELSE 0 END as engagement_rate
+    FROM creators c
+    LEFT JOIN posts p ON c.username = p.creator_username
+    GROUP BY c.username
+    ORDER BY c.followers DESC
+  `).all();
+}
+
 function getCreatorByUsername(username) {
   return db.prepare("SELECT * FROM creators WHERE username = ?").get(username);
 }
@@ -136,6 +151,7 @@ module.exports = {
   upsertCreator,
   upsertPost,
   getAllCreators,
+  getCreatorsWithEngagement,
   getCreatorByUsername,
   getPostsByCreator,
   getStats,

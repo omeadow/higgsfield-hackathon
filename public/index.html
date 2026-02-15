@@ -115,6 +115,8 @@
       <option value="followers-asc">Followers (Low to High)</option>
       <option value="posts-desc">Posts (High to Low)</option>
       <option value="posts-asc">Posts (Low to High)</option>
+      <option value="engagement-desc">Engagement (High to Low)</option>
+      <option value="engagement-asc">Engagement (Low to High)</option>
       <option value="name-asc">Name (A-Z)</option>
       <option value="name-desc">Name (Z-A)</option>
     </select>
@@ -133,12 +135,16 @@
       return n.toLocaleString();
     }
 
-    function renderStats(stats) {
+    function renderStats(stats, creators) {
+      const engagementRates = creators.filter(c => c.engagement_rate > 0).map(c => c.engagement_rate);
+      const avgEngagement = engagementRates.length
+        ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(2)
+        : '0';
       document.getElementById('stats-bar').innerHTML = `
         <div class="stat-card"><div class="value">${stats.total_creators}</div><div class="label">Creators</div></div>
         <div class="stat-card"><div class="value">${formatNum(stats.total_followers)}</div><div class="label">Total Reach</div></div>
         <div class="stat-card"><div class="value">${formatNum(stats.avg_followers)}</div><div class="label">Avg Followers</div></div>
-        <div class="stat-card"><div class="value">${formatNum(stats.max_followers)}</div><div class="label">Top Followers</div></div>
+        <div class="stat-card"><div class="value">${avgEngagement}%</div><div class="label">Avg Engagement</div></div>
         <div class="stat-card"><div class="value">${stats.verified_count}</div><div class="label">Verified</div></div>
         <div class="stat-card"><div class="value">${formatNum(stats.total_posts)}</div><div class="label">Total Posts</div></div>
       `;
@@ -167,6 +173,7 @@
             <div class="card-stat"><div class="num">${formatNum(c.followers)}</div><div class="lbl">Followers</div></div>
             <div class="card-stat"><div class="num">${formatNum(c.following)}</div><div class="lbl">Following</div></div>
             <div class="card-stat"><div class="num">${formatNum(c.posts_count)}</div><div class="lbl">Posts</div></div>
+            <div class="card-stat"><div class="num">${c.engagement_rate ?? 0}%</div><div class="lbl">Engagement</div></div>
           </div>
         </div>
       `;
@@ -187,6 +194,7 @@
         let va, vb;
         if (field === 'followers') { va = a.followers; vb = b.followers; }
         else if (field === 'posts') { va = a.posts_count; vb = b.posts_count; }
+        else if (field === 'engagement') { va = a.engagement_rate || 0; vb = b.engagement_rate || 0; }
         else { va = (a.full_name || a.username).toLowerCase(); vb = (b.full_name || b.username).toLowerCase(); }
 
         if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
@@ -219,7 +227,7 @@
         fetch('/api/stats').then(r => r.json()),
       ]);
       creators = creatorsRes;
-      renderStats(statsRes);
+      renderStats(statsRes, creators);
       render();
     }
 

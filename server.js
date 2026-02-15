@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { getAllCreators, getCreatorByUsername, getPostsByCreator, getStats } = require("./db");
+const { getCreatorsWithEngagement, getCreatorByUsername, getPostsByCreator, getStats } = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/avatars", express.static(path.join(__dirname, "data", "avatars")));
 
 app.get("/api/creators", (req, res) => {
-  res.json(getAllCreators());
+  res.json(getCreatorsWithEngagement());
 });
 
 app.get("/api/creators/:username", (req, res) => {
