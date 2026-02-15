@@ -15,28 +15,70 @@ const SEARCH_QUERIES = [
   "video editing workflow tutorial",
   "how I edit my videos premiere pro",
   "after effects workflow tutorial",
+  "davinci resolve editing workflow",
+  "my video editing process",
+  "how to edit youtube videos faster",
+  "color grading workflow tutorial",
   // UGC / Ad Creative
   "UGC ad creative tools",
   "ai ugc video maker",
-  // AI video tools
+  "how to make ugc ads",
+  "ugc creator workflow",
+  "performance creative video ads",
+  "tiktok ad creative process",
+  // AI video tools & generation
   "ai video generation tools 2025",
   "best ai video tools comparison",
   "ai filmmaking tools review",
   "kling ai video tutorial",
   "ai video editing software",
+  "runway ml tutorial",
+  "pika ai video",
+  "sora ai video examples",
+  "ai b-roll generator",
+  "ai video for marketing",
+  "ai tools for content creators 2025",
+  "ai video production workflow",
+  // AI tool comparison / reviews
+  "best ai tools for video creators",
+  "ai video editor comparison",
+  "top ai tools for youtubers",
+  "ai tools review for filmmakers",
+  "ai image to video tools ranked",
   // Cinematic breakdowns
   "cinematic video breakdown tutorial",
   "recreating viral ads breakdown",
-  // Creator tools
+  "how this ad was made breakdown",
+  "commercial filmmaking breakdown",
+  "film technique analysis youtube",
+  "viral video editing techniques",
+  "recreating famous movie shots",
+  // Creator tools & business
   "content creator video tools",
   "course creator video production",
+  "youtube automation tools",
+  "creator economy tools 2025",
+  "how to sell digital products video",
+  "online course video production",
+  // Short-form video creation
+  "how to make reels for business",
+  "short form video editing tips",
+  "vertical video editing workflow",
+  // Motion graphics / VFX
+  "motion graphics tutorial beginner",
+  "vfx breakdown youtube",
+  "after effects templates tutorial",
   // Direct brand mentions
   "higgsfield ai",
+  "higgsfield ai video",
   "seedance ai video",
+  "cinema studio ai",
 ];
 
 const RESULTS_PER_QUERY = 20;
-const MAX_CHANNELS = 200;
+const MIN_SUBSCRIBERS = 10000;
+const MAX_SUBSCRIBERS = 500000;
+const MAX_CHANNELS = 300;
 const CHANNEL_BATCH_SIZE = 15;
 
 async function searchForVideos() {
@@ -148,6 +190,7 @@ async function scrapeChannelsBatch(channelUrls) {
 async function main() {
   console.log("=== YOUTUBE SCRAPER ===");
   console.log(`Queries: ${SEARCH_QUERIES.length}`);
+  console.log(`Subscriber filter: ${MIN_SUBSCRIBERS/1000}K - ${MAX_SUBSCRIBERS/1000}K`);
   console.log(`Max channels: ${MAX_CHANNELS}\n`);
 
   // Phase 1: Search for videos to discover channels
@@ -192,12 +235,21 @@ async function main() {
       }
     }
 
-    // Persist to DB
+    // Persist to DB — only channels in target subscriber range
+    let skippedCount = 0;
     for (const [chId, data] of Object.entries(channelMap)) {
+      const subs = data.profile.subscriberCount || 0;
+      if (subs < MIN_SUBSCRIBERS || subs > MAX_SUBSCRIBERS) {
+        skippedCount++;
+        continue;
+      }
       upsertYtCreator(data.profile);
       for (const video of data.videos) {
         upsertYtVideo(video, chId);
       }
+    }
+    if (skippedCount > 0) {
+      console.log(`  Skipped ${skippedCount} channels outside ${MIN_SUBSCRIBERS/1000}K-${MAX_SUBSCRIBERS/1000}K range`);
     }
 
     // Download avatars

@@ -336,13 +336,13 @@ function getYtCreatorsWithEngagement() {
         THEN ROUND((COALESCE(AVG(v.likes), 0) + COALESCE(AVG(v.comments), 0)) * 100.0 / AVG(v.views), 2)
         ELSE 0 END as engagement_rate,
       CASE
-        WHEN c.subscribers >= 1000000 THEN 'macro'
         WHEN c.subscribers >= 100000 THEN 'mid-tier'
         WHEN c.subscribers >= 10000 THEN 'micro'
         ELSE 'nano'
       END as tier
     FROM yt_creators c
     LEFT JOIN yt_videos v ON c.channel_id = v.channel_id
+    WHERE c.subscribers >= 10000 AND c.subscribers <= 500000
     GROUP BY c.channel_id
     ORDER BY c.subscribers DESC
   `).all();
@@ -367,6 +367,7 @@ function getYtStats() {
       SUM(is_verified) as verified_count,
       COALESCE(SUM(video_count), 0) as total_videos
     FROM yt_creators
+    WHERE subscribers >= 10000 AND subscribers <= 500000
   `).get();
 }
 
