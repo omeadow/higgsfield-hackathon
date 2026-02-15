@@ -6,59 +6,137 @@ const { downloadYtAvatarsBatch } = require("./avatars");
 
 const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
 
-const KEYWORDS = ["higgsfield", "higgsai", "aivideo", "aifilmmaking", "cinemastudio", "klingai", "seedance"];
+// Single actor handles both search and channel scraping
+const ACTOR_ID = "streamers/youtube-channel-scraper";
+
+// Search queries aligned with ideal creator profiles
+const SEARCH_QUERIES = [
+  // Workflow Tutorial Videomakers
+  "video editing workflow tutorial",
+  "how I edit my videos premiere pro",
+  "after effects workflow tutorial",
+  // UGC / Ad Creative
+  "UGC ad creative tools",
+  "ai ugc video maker",
+  // AI video tools
+  "ai video generation tools 2025",
+  "best ai video tools comparison",
+  "ai filmmaking tools review",
+  "kling ai video tutorial",
+  "ai video editing software",
+  // Cinematic breakdowns
+  "cinematic video breakdown tutorial",
+  "recreating viral ads breakdown",
+  // Creator tools
+  "content creator video tools",
+  "course creator video production",
+  // Direct brand mentions
+  "higgsfield ai",
+  "seedance ai video",
+];
+
+const RESULTS_PER_QUERY = 20;
 const MAX_CHANNELS = 200;
-const VIDEOS_PER_SEARCH = 100;
-const BATCH_SIZE = 20;
+const CHANNEL_BATCH_SIZE = 15;
 
-// Apify actor names — adjust if these change on the marketplace
-const SEARCH_ACTOR = "bernardo/youtube-scraper";
-const CHANNEL_ACTOR = "streamers/youtube-channel-scraper";
-
-async function searchYouTube() {
+async function searchForVideos() {
   const allVideos = [];
+  const searchUrls = SEARCH_QUERIES.map(q => ({
+    url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`,
+  }));
 
-  for (const keyword of KEYWORDS) {
-    console.log(`Searching YouTube for "${keyword}"...`);
-    try {
-      const run = await client.actor(SEARCH_ACTOR).call({
-        searchKeywords: [keyword],
-        maxResults: VIDEOS_PER_SEARCH,
-        searchType: "video",
-      });
-      const dataset = await client.dataset(run.defaultDatasetId).listItems();
-      console.log(`  "${keyword}": ${dataset.items.length} videos`);
-      allVideos.push(...dataset.items);
-    } catch (err) {
-      console.warn(`  Failed to search "${keyword}": ${err.message}`);
-    }
+  // Run all search queries in one actor call
+  console.log(`Searching YouTube with ${SEARCH_QUERIES.length} queries...`);
+  try {
+    const run = await client.actor(ACTOR_ID).call({
+      startUrls: searchUrls,
+      maxResults: RESULTS_PER_QUERY,
+      maxResultsShorts: 0,
+      maxResultStreams: 0,
+    }, { timeout: 300 });
+
+    const dataset = await client.dataset(run.defaultDatasetId).listItems();
+    console.log(`  Found ${dataset.items.length} videos from search`);
+    allVideos.push(...dataset.items);
+  } catch (err) {
+    console.error(`  Search failed: ${err.message}`);
   }
 
   return allVideos;
 }
 
-function extractChannelUrls(videos) {
+function extractUniqueChannels(videos) {
   const seen = new Set();
   const channels = [];
 
   for (const v of videos) {
-    const channelUrl = v.channelUrl || v.channelLink;
+    const channelUrl = v.channelUrl;
     const channelId = v.channelId;
     const key = channelId || channelUrl;
     if (!key || seen.has(key)) continue;
     seen.add(key);
-    channels.push({ channelUrl, channelId, channelName: v.channelName });
+
+    // Build a proper channel URL
+    let url = channelUrl;
+    if (!url && v.channelUsername) {
+      url = `https://www.youtube.com/@${v.channelUsername}`;
+    }
+    if (!url && channelId) {
+      url = `https://www.youtube.com/channel/${channelId}`;
+    }
+    if (!url) continue;
+
+    channels.push({
+      channelUrl: url,
+      channelId,
+      channelName: v.channelName,
+    });
   }
 
   return channels.slice(0, MAX_CHANNELS);
 }
 
+function normalizeChannelData(item) {
+  return {
+    channelId: item.channelId || item.id,
+    channelName: item.aboutChannelInfo?.channelName || item.channelName || item.title,
+    handle: item.channelUsername || item.aboutChannelInfo?.channelHandle,
+    description: item.channelDescription || item.aboutChannelInfo?.channelDescription || item.description || "",
+    subscriberCount: item.numberOfSubscribers || item.subscriberCount || 0,
+    viewCount: item.channelTotalViews || item.viewCount || 0,
+    videoCount: item.channelTotalVideos || item.videoCount || 0,
+    isVerified: item.isChannelVerified || false,
+    channelUrl: item.inputChannelUrl || item.channelUrl || item.url,
+    thumbnailUrl: item.channelAvatarUrl || item.thumbnailUrl,
+    country: item.channelLocation || item.aboutChannelInfo?.channelLocation || "",
+    joinedDate: item.channelJoinedDate || item.aboutChannelInfo?.channelJoinedDate || "",
+  };
+}
+
+function normalizeVideoData(item) {
+  return {
+    videoId: item.id,
+    title: item.title,
+    description: item.description || "",
+    url: item.url,
+    viewCount: item.viewCount || 0,
+    likeCount: item.likeCount || item.likes || 0,
+    commentCount: item.commentCount || item.commentsCount || 0,
+    duration: item.duration,
+    publishedAt: item.date || item.publishedAt,
+    thumbnailUrl: item.thumbnailUrl,
+  };
+}
+
 async function scrapeChannelsBatch(channelUrls) {
   try {
-    const run = await client.actor(CHANNEL_ACTOR).call({
-      channelUrls: channelUrls.map(u => ({ url: u })),
-      maxVideos: 30,
-    });
+    const run = await client.actor(ACTOR_ID).call({
+      startUrls: channelUrls.map(u => ({ url: u })),
+      maxResults: 20,
+      maxResultsShorts: 0,
+      maxResultStreams: 0,
+    }, { timeout: 300 });
+
     const dataset = await client.dataset(run.defaultDatasetId).listItems();
     return dataset.items;
   } catch (err) {
@@ -68,48 +146,70 @@ async function scrapeChannelsBatch(channelUrls) {
 }
 
 async function main() {
-  console.log(`YouTube scraping: ${KEYWORDS.length} keywords, up to ${MAX_CHANNELS} channels`);
-  console.log(`Keywords: ${KEYWORDS.join(", ")}\n`);
+  console.log("=== YOUTUBE SCRAPER ===");
+  console.log(`Queries: ${SEARCH_QUERIES.length}`);
+  console.log(`Max channels: ${MAX_CHANNELS}\n`);
 
   // Phase 1: Search for videos to discover channels
-  const allVideos = await searchYouTube();
+  const allVideos = await searchForVideos();
   console.log(`\nTotal videos found: ${allVideos.length}`);
 
   // Save raw search results
   fs.writeFileSync("data/yt_search_results.json", JSON.stringify(allVideos, null, 2));
 
   // Phase 2: Extract unique channels
-  const channels = extractChannelUrls(allVideos);
+  const channels = extractUniqueChannels(allVideos);
   console.log(`Unique channels to scrape: ${channels.length}\n`);
 
-  // Phase 3: Batch channel scraping
+  if (channels.length === 0) {
+    console.log("No channels found. Check search queries or API limits.");
+    return;
+  }
+
+  // Phase 3: Scrape each channel for full profile + videos
   const allProfiles = [];
   const channelUrls = channels.map(c => c.channelUrl).filter(Boolean);
-  const totalBatches = Math.ceil(channelUrls.length / BATCH_SIZE);
+  const totalBatches = Math.ceil(channelUrls.length / CHANNEL_BATCH_SIZE);
 
-  for (let i = 0; i < channelUrls.length; i += BATCH_SIZE) {
-    const batch = channelUrls.slice(i, i + BATCH_SIZE);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+  for (let i = 0; i < channelUrls.length; i += CHANNEL_BATCH_SIZE) {
+    const batch = channelUrls.slice(i, i + CHANNEL_BATCH_SIZE);
+    const batchNum = Math.floor(i / CHANNEL_BATCH_SIZE) + 1;
     console.log(`Batch ${batchNum}/${totalBatches} - scraping ${batch.length} channels...`);
 
-    const profiles = await scrapeChannelsBatch(batch);
-    console.log(`  Got ${profiles.length} channel profiles`);
+    const items = await scrapeChannelsBatch(batch);
 
-    // Persist to DB incrementally
-    for (const profile of profiles) {
-      upsertYtCreator(profile);
-      const videos = profile.latestVideos || profile.videos || profile.recentVideos || [];
-      const channelId = profile.channelId || profile.id;
-      for (const video of videos) {
-        upsertYtVideo(video, channelId);
+    // Group items by channel — actor returns one item per video
+    const channelMap = {};
+    for (const item of items) {
+      const chId = item.channelId;
+      if (!chId) continue;
+      if (!channelMap[chId]) {
+        channelMap[chId] = { profile: normalizeChannelData(item), videos: [] };
+      }
+      // Each item is a video result, collect them
+      if (item.id && item.title) {
+        channelMap[chId].videos.push(normalizeVideoData(item));
       }
     }
 
-    // Download thumbnails
-    await downloadYtAvatarsBatch(profiles);
+    // Persist to DB
+    for (const [chId, data] of Object.entries(channelMap)) {
+      upsertYtCreator(data.profile);
+      for (const video of data.videos) {
+        upsertYtVideo(video, chId);
+      }
+    }
 
-    allProfiles.push(...profiles);
-    console.log(`  Progress: ${allProfiles.length}/${channels.length} channels saved\n`);
+    // Download avatars
+    const avatarData = Object.values(channelMap).map(d => ({
+      channelId: d.profile.channelId,
+      thumbnailUrl: d.profile.thumbnailUrl,
+    }));
+    await downloadYtAvatarsBatch(avatarData);
+
+    const newCount = Object.keys(channelMap).length;
+    allProfiles.push(...Object.values(channelMap).map(d => d.profile));
+    console.log(`  Got ${newCount} channels, ${items.length} items. Progress: ${allProfiles.length} total\n`);
   }
 
   // Save combined JSON
@@ -119,14 +219,12 @@ async function main() {
   console.log("=== YOUTUBE SCRAPING DONE ===");
   console.log(`Total channels scraped: ${allProfiles.length}`);
   console.log(`Total videos in search: ${allVideos.length}`);
-  console.log("\nTop 10 YouTube channels by subscribers:");
+  console.log("\nTop 10 channels by subscribers:");
   allProfiles
-    .sort((a, b) => (b.subscriberCount ?? b.subscribers ?? 0) - (a.subscriberCount ?? a.subscribers ?? 0))
+    .sort((a, b) => (b.subscriberCount || 0) - (a.subscriberCount || 0))
     .slice(0, 10)
     .forEach(c => {
-      const subs = c.subscriberCount ?? c.subscribers ?? 0;
-      const name = c.channelName || c.name || c.handle || "Unknown";
-      console.log(`  ${name} - ${subs.toLocaleString()} subscribers`);
+      console.log(`  ${c.channelName || "Unknown"} - ${(c.subscriberCount || 0).toLocaleString()} subscribers`);
     });
 }
 
