@@ -8,12 +8,40 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; }
 
+    :root {
+      --accent: #667eea;
+      --accent-light: rgba(102,126,234,0.15);
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    body.yt-mode {
+      --accent: #cc0000;
+      --accent-light: rgba(204,0,0,0.12);
+      --gradient: linear-gradient(135deg, #cc0000 0%, #8b0000 100%);
+    }
+
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--gradient);
       color: white; padding: 24px 32px;
+      transition: background 0.3s;
     }
     .header h1 { font-size: 24px; font-weight: 700; }
     .header p { opacity: 0.85; margin-top: 4px; font-size: 14px; }
+
+    /* Platform Toggle */
+    .platform-toggle {
+      display: flex; justify-content: center; gap: 0;
+      background: white; padding: 12px 32px; border-bottom: 1px solid #e4e6eb;
+    }
+    .platform-btn {
+      padding: 10px 28px; font-size: 14px; font-weight: 600;
+      border: 2px solid #e4e6eb; background: white; color: #65676b;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .platform-btn:first-child { border-radius: 8px 0 0 8px; border-right: 1px solid #e4e6eb; }
+    .platform-btn:last-child { border-radius: 0 8px 8px 0; border-left: 1px solid #e4e6eb; }
+    .platform-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .platform-btn:hover:not(.active) { color: var(--accent); border-color: var(--accent); }
+    .platform-icon { font-weight: 700; margin-right: 4px; }
 
     .stats-bar {
       display: flex; gap: 16px; padding: 20px 32px; background: white;
@@ -23,7 +51,7 @@
       flex: 1; min-width: 120px; padding: 16px; background: #f8f9fb;
       border-radius: 10px; text-align: center;
     }
-    .stat-card .value { font-size: 24px; font-weight: 700; color: #667eea; }
+    .stat-card .value { font-size: 24px; font-weight: 700; color: var(--accent); }
     .stat-card .label { font-size: 11px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
     .controls {
@@ -33,7 +61,7 @@
       flex: 1; min-width: 200px; padding: 10px 16px; border: 1px solid #ddd;
       border-radius: 8px; font-size: 14px; outline: none;
     }
-    .controls input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
+    .controls input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
     .controls select {
       padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px;
       font-size: 14px; background: white; cursor: pointer;
@@ -46,8 +74,8 @@
       padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
       cursor: pointer; border: 1px solid #ddd; background: white; transition: all 0.2s;
     }
-    .chip:hover { border-color: #667eea; color: #667eea; }
-    .chip.active { background: #667eea; color: white; border-color: #667eea; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+    .chip.active { background: var(--accent); color: white; border-color: var(--accent); }
     .chip .count { font-size: 11px; opacity: 0.7; margin-left: 4px; }
 
     .grid {
@@ -66,30 +94,30 @@
     }
     .avatar {
       width: 60px; height: 60px; border-radius: 50%; object-fit: cover;
-      border: 3px solid #667eea; flex-shrink: 0;
+      border: 3px solid var(--accent); flex-shrink: 0;
     }
     .avatar-fallback {
-      width: 60px; height: 60px; border-radius: 50%; background: #667eea;
+      width: 60px; height: 60px; border-radius: 50%; background: var(--accent);
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 24px; font-weight: 700; flex-shrink: 0;
     }
     .avatar-small {
       width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
-      border: 2px solid #667eea; flex-shrink: 0;
+      border: 2px solid var(--accent); flex-shrink: 0;
     }
     .avatar-fallback-small {
-      width: 36px; height: 36px; border-radius: 50%; background: #667eea;
+      width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 14px; font-weight: 700; flex-shrink: 0;
     }
     .card-identity { flex: 1; min-width: 0; }
     .card-identity .username {
-      font-size: 15px; font-weight: 600; color: #667eea;
+      font-size: 15px; font-weight: 600; color: var(--accent);
       text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
     }
     .card-identity .username:hover { text-decoration: underline; }
     .verified-badge {
-      display: inline-block; width: 16px; height: 16px; background: #667eea;
+      display: inline-block; width: 16px; height: 16px; background: var(--accent);
       border-radius: 50%; color: white; font-size: 10px; text-align: center;
       line-height: 16px;
     }
@@ -147,8 +175,8 @@
       cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
       transition: color 0.2s;
     }
-    .tab:hover { color: #667eea; }
-    .tab.active { color: #667eea; border-bottom-color: #667eea; }
+    .tab:hover { color: var(--accent); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -160,18 +188,18 @@
     .methodology h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; color: #1a1a2e; }
     .methodology p { font-size: 15px; line-height: 1.7; color: #444; margin-bottom: 12px; }
     .formula-box {
-      background: linear-gradient(135deg, #667eea15, #764ba215);
-      border: 1px solid #667eea30; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent-light));
+      border: 1px solid var(--accent); border-radius: 10px; opacity: 0.85;
       padding: 24px; text-align: center; margin: 20px 0;
     }
-    .formula-box .formula { font-size: 18px; font-weight: 700; color: #667eea; font-family: monospace; }
+    .formula-box .formula { font-size: 18px; font-weight: 700; color: var(--accent); font-family: monospace; }
     .formula-box .formula-note { font-size: 13px; color: #65676b; margin-top: 8px; }
     .scale-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
     .scale-table th, .scale-table td {
       padding: 10px 16px; text-align: left; border-bottom: 1px solid #e4e6eb; font-size: 14px;
     }
     .scale-table th { font-weight: 600; color: #65676b; font-size: 12px; text-transform: uppercase; }
-    .scale-table .rate { font-weight: 700; color: #667eea; }
+    .scale-table .rate { font-weight: 700; color: var(--accent); }
     .note-box {
       background: #fff8e6; border: 1px solid #f0d060; border-radius: 8px;
       padding: 16px; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #6b5900;
@@ -200,8 +228,8 @@
       font-size: 14px; outline: none;
     }
     .input-group input[type="range"] { padding: 0; margin-top: 4px; }
-    .input-group .range-value { font-size: 14px; font-weight: 600; color: #667eea; float: right; }
-    .input-group input[type="number"]:focus { border-color: #667eea; }
+    .input-group .range-value { font-size: 14px; font-weight: 600; color: var(--accent); float: right; }
+    .input-group input[type="number"]:focus { border-color: var(--accent); }
     .output-row {
       display: flex; justify-content: space-between; padding: 12px 0;
       border-bottom: 1px solid #f0f0f0; font-size: 14px;
@@ -215,7 +243,7 @@
       width: 100%; height: 24px; background: #f0f2f5; border-radius: 12px; overflow: hidden;
     }
     .progress-bar-fill {
-      height: 100%; background: linear-gradient(90deg, #667eea, #10b981);
+      height: 100%; background: linear-gradient(90deg, var(--accent), #10b981);
       border-radius: 12px; transition: width 0.3s; min-width: 0;
     }
     .progress-label {
@@ -228,8 +256,8 @@
       flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white;
       font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center;
     }
-    .scenario-btn:hover { border-color: #667eea; color: #667eea; }
-    .scenario-btn.active { background: #667eea; color: white; border-color: #667eea; }
+    .scenario-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .scenario-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
     /* Campaign Tracker */
     .campaign-container {
@@ -245,7 +273,7 @@
     }
     .pipeline-stat .ps-value { font-size: 28px; font-weight: 700; }
     .pipeline-stat .ps-label { font-size: 12px; color: #65676b; text-transform: uppercase; margin-top: 4px; }
-    .pipeline-stat .ps-pct { font-size: 11px; color: #667eea; margin-top: 2px; }
+    .pipeline-stat .ps-pct { font-size: 11px; color: var(--accent); margin-top: 2px; }
     .ps-not_contacted .ps-value { color: #9ca3af; }
     .ps-contacted .ps-value { color: #f59e0b; }
     .ps-confirmed .ps-value { color: #3b82f6; }
@@ -270,11 +298,9 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.06); cursor: pointer; transition: box-shadow 0.2s;
     }
     .pipeline-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-    .pipeline-card-row {
-      display: flex; align-items: center; gap: 8px;
-    }
+    .pipeline-card-row { display: flex; align-items: center; gap: 8px; }
     .pipeline-card .pc-info { flex: 1; min-width: 0; }
-    .pipeline-card .pc-username { font-size: 13px; font-weight: 600; color: #667eea; }
+    .pipeline-card .pc-username { font-size: 13px; font-weight: 600; color: var(--accent); }
     .pipeline-card .pc-followers { font-size: 11px; color: #65676b; }
     .pipeline-card .pc-notes { font-size: 11px; color: #888; margin-top: 4px; font-style: italic; }
     .pipeline-card select {
@@ -286,25 +312,24 @@
       margin-top: 4px; width: 100%; resize: vertical; min-height: 40px; font-family: inherit;
     }
     .pipeline-card .save-btn {
-      font-size: 11px; padding: 4px 10px; background: #667eea; color: white;
+      font-size: 11px; padding: 4px 10px; background: var(--accent); color: white;
       border: none; border-radius: 6px; cursor: pointer; margin-top: 4px;
     }
-    .pipeline-card .save-btn:hover { background: #5a6fd6; }
+    .pipeline-card .save-btn:hover { opacity: 0.9; }
 
-    /* Add to campaign button on creator cards */
     .card-actions { padding: 0 20px 14px; }
     .add-campaign-btn {
-      font-size: 12px; padding: 5px 12px; border: 1px solid #667eea; color: #667eea;
+      font-size: 12px; padding: 5px 12px; border: 1px solid var(--accent); color: var(--accent);
       background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s;
     }
-    .add-campaign-btn:hover { background: #667eea; color: white; }
+    .add-campaign-btn:hover { background: var(--accent); color: white; }
 
     @media (max-width: 900px) {
       .calc-grid { grid-template-columns: 1fr; }
       .pipeline-columns { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 600px) {
-      .header, .stats-bar, .controls, .grid, .tabs, .filter-chips { padding-left: 16px; padding-right: 16px; }
+      .header, .stats-bar, .controls, .grid, .tabs, .filter-chips, .platform-toggle { padding-left: 16px; padding-right: 16px; }
       .grid { grid-template-columns: 1fr; }
       .methodology, .revenue-container, .campaign-container { padding: 0 16px; }
       .pipeline-columns { grid-template-columns: 1fr; }
@@ -314,7 +339,16 @@
 <body>
   <div class="header">
     <h1>#higgsfield Creator Dashboard</h1>
-    <p>Instagram creators using the #higgsfield hashtag</p>
+    <p id="header-subtitle">Instagram creators using the #higgsfield hashtag</p>
+  </div>
+
+  <div class="platform-toggle">
+    <button class="platform-btn active" data-platform="instagram">
+      <span class="platform-icon">IG</span> Instagram
+    </button>
+    <button class="platform-btn" data-platform="youtube">
+      <span class="platform-icon">YT</span> YouTube
+    </button>
   </div>
 
   <div class="tabs">
@@ -327,24 +361,12 @@
   <!-- Creators Tab -->
   <div id="tab-creators" class="tab-content active">
     <div class="stats-bar" id="stats-bar"></div>
-
     <div class="filter-chips" id="tier-filters"></div>
     <div class="filter-chips" id="niche-filters"></div>
-
     <div class="controls">
       <input type="text" id="search" placeholder="Search by username, name, or bio...">
-      <select id="sort">
-        <option value="followers-desc">Followers (High to Low)</option>
-        <option value="followers-asc">Followers (Low to High)</option>
-        <option value="posts-desc">Posts (High to Low)</option>
-        <option value="posts-asc">Posts (Low to High)</option>
-        <option value="engagement-desc">Engagement (High to Low)</option>
-        <option value="engagement-asc">Engagement (Low to High)</option>
-        <option value="name-asc">Name (A-Z)</option>
-        <option value="name-desc">Name (Z-A)</option>
-      </select>
+      <select id="sort"></select>
     </div>
-
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty" style="display:none">No creators match your search.</div>
   </div>
@@ -373,7 +395,7 @@
             <input type="range" id="calc-partners" min="1" max="20" value="5">
           </div>
           <div class="input-group">
-            <label>Avg Audience Reach per Creator <span class="range-value" id="reach-val">0</span></label>
+            <label id="reach-label">Avg Audience Reach per Creator <span class="range-value" id="reach-val">0</span></label>
             <input type="number" id="calc-reach" value="0" min="0">
           </div>
           <div class="input-group">
@@ -432,52 +454,19 @@
 
   <!-- How Engagement Works Tab -->
   <div id="tab-methodology" class="tab-content">
-    <div class="methodology">
-      <h2>Understanding Engagement Rate</h2>
-
-      <p>Engagement rate measures how actively a creator's audience interacts with their content. Instead of just looking at how many followers someone has, engagement rate tells you how many of those followers actually pay attention.</p>
-
-      <h3>The Formula</h3>
-      <div class="formula-box">
-        <div class="formula">(Likes + Comments) / Followers &times; 100</div>
-        <div class="formula-note">Result is shown as a percentage</div>
-      </div>
-
-      <p>We add up all the likes and comments across a creator's recent posts, then divide by their follower count. The result is multiplied by 100 to express it as a percentage.</p>
-
-      <p><strong>For example:</strong> if a creator has 10,000 followers and their recent posts received a total of 1,500 likes and 200 comments, their engagement rate would be:</p>
-      <div class="formula-box">
-        <div class="formula">(1,500 + 200) / 10,000 &times; 100 = 17%</div>
-      </div>
-
-      <h3>What the Numbers Mean</h3>
-      <table class="scale-table">
-        <thead>
-          <tr><th>Engagement Rate</th><th>What It Means</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="rate">Less than 1%</td><td>Low engagement &mdash; the audience is mostly passive or the account may have inflated follower counts</td></tr>
-          <tr><td class="rate">1% &ndash; 3%</td><td>Average &mdash; typical for larger accounts where a smaller share of followers interact</td></tr>
-          <tr><td class="rate">3% &ndash; 6%</td><td>Good &mdash; the creator has a responsive, interested audience</td></tr>
-          <tr><td class="rate">Above 6%</td><td>Excellent &mdash; strong community connection, common with smaller or niche creators</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Why It Matters</h3>
-      <p>A creator with 5,000 followers and a 10% engagement rate may be more valuable for partnerships than one with 100,000 followers and a 0.5% rate. High engagement means the audience trusts the creator and is likely to act on their recommendations.</p>
-
-      <h3>What's Not Included</h3>
-      <div class="note-box">
-        The full engagement formula ideally includes <strong>shares</strong> and <strong>saves</strong> in addition to likes and comments. However, Instagram does not make share and save counts publicly available &mdash; only the account owner can see those numbers. Our calculation uses the two metrics that are publicly accessible: likes and comments.
-      </div>
-    </div>
+    <div class="methodology" id="methodology-content"></div>
   </div>
 
   <script>
+    // ========== STATE ==========
+    let activePlatform = 'instagram';
     let creators = [];
+    let ytCreators = [];
     let campaignStatuses = {};
+    let ytCampaignStatuses = {};
     let activeTierFilter = 'all';
     let activeNicheFilter = 'all';
+    let ytDataLoaded = false;
 
     function formatNum(n) {
       if (n == null) return '0';
@@ -490,125 +479,196 @@
       return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    function isYt() { return activePlatform === 'youtube'; }
+    function activeCreators() { return isYt() ? ytCreators : creators; }
+    function activeCampaignStatuses() { return isYt() ? ytCampaignStatuses : campaignStatuses; }
+
+    // ========== PLATFORM TOGGLE ==========
+    document.querySelectorAll('.platform-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (btn.dataset.platform === activePlatform) return;
+        activePlatform = btn.dataset.platform;
+
+        document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (isYt()) {
+          document.body.classList.add('yt-mode');
+          document.getElementById('header-subtitle').textContent = 'YouTube creators in the AI video space';
+          if (!ytDataLoaded) await loadYtData();
+        } else {
+          document.body.classList.remove('yt-mode');
+          document.getElementById('header-subtitle').textContent = 'Instagram creators using the #higgsfield hashtag';
+        }
+
+        activeTierFilter = 'all';
+        activeNicheFilter = 'all';
+        renderSortOptions();
+        renderAll();
+      });
+    });
+
+    // ========== SORT OPTIONS ==========
+    function renderSortOptions() {
+      const sortEl = document.getElementById('sort');
+      if (isYt()) {
+        sortEl.innerHTML = `
+          <option value="subscribers-desc">Subscribers (High to Low)</option>
+          <option value="subscribers-asc">Subscribers (Low to High)</option>
+          <option value="views-desc">Total Views (High to Low)</option>
+          <option value="videos-desc">Videos (High to Low)</option>
+          <option value="engagement-desc">Engagement (High to Low)</option>
+          <option value="engagement-asc">Engagement (Low to High)</option>
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+        `;
+      } else {
+        sortEl.innerHTML = `
+          <option value="followers-desc">Followers (High to Low)</option>
+          <option value="followers-asc">Followers (Low to High)</option>
+          <option value="posts-desc">Posts (High to Low)</option>
+          <option value="posts-asc">Posts (Low to High)</option>
+          <option value="engagement-desc">Engagement (High to Low)</option>
+          <option value="engagement-asc">Engagement (Low to High)</option>
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+        `;
+      }
+    }
+
     // ========== STATS BAR ==========
-    function renderStats(stats, creators) {
-      const engagementRates = creators.filter(c => c.engagement_rate > 0).map(c => c.engagement_rate);
+    function renderStats(stats) {
+      const data = activeCreators();
+      const engagementRates = data.filter(c => c.engagement_rate > 0).map(c => c.engagement_rate);
       const avgEngagement = engagementRates.length
-        ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(2)
-        : '0';
+        ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(2) : '0';
 
       const tierCounts = { macro: 0, 'mid-tier': 0, micro: 0, nano: 0 };
-      creators.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
+      data.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
 
-      document.getElementById('stats-bar').innerHTML = `
-        <div class="stat-card"><div class="value">${stats.total_creators}</div><div class="label">Creators</div></div>
-        <div class="stat-card"><div class="value">${formatNum(stats.total_followers)}</div><div class="label">Total Reach</div></div>
-        <div class="stat-card"><div class="value">${formatNum(stats.avg_followers)}</div><div class="label">Avg Followers</div></div>
-        <div class="stat-card"><div class="value">${avgEngagement}%</div><div class="label">Avg Engagement</div></div>
-        <div class="stat-card"><div class="value">${tierCounts.macro}</div><div class="label">Macro (200K+)</div></div>
-        <div class="stat-card"><div class="value">${tierCounts['mid-tier']}</div><div class="label">Mid-tier</div></div>
-        <div class="stat-card"><div class="value">${tierCounts.micro}</div><div class="label">Micro</div></div>
-        <div class="stat-card"><div class="value">${tierCounts.nano}</div><div class="label">Nano</div></div>
-      `;
+      if (isYt()) {
+        document.getElementById('stats-bar').innerHTML = `
+          <div class="stat-card"><div class="value">${stats.total_channels}</div><div class="label">Channels</div></div>
+          <div class="stat-card"><div class="value">${formatNum(stats.total_subscribers)}</div><div class="label">Total Subscribers</div></div>
+          <div class="stat-card"><div class="value">${formatNum(stats.avg_subscribers)}</div><div class="label">Avg Subscribers</div></div>
+          <div class="stat-card"><div class="value">${avgEngagement}%</div><div class="label">Avg Engagement</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.macro}</div><div class="label">Macro (1M+)</div></div>
+          <div class="stat-card"><div class="value">${tierCounts['mid-tier']}</div><div class="label">Mid-tier</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.micro}</div><div class="label">Micro</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.nano}</div><div class="label">Nano</div></div>
+        `;
+      } else {
+        document.getElementById('stats-bar').innerHTML = `
+          <div class="stat-card"><div class="value">${stats.total_creators}</div><div class="label">Creators</div></div>
+          <div class="stat-card"><div class="value">${formatNum(stats.total_followers)}</div><div class="label">Total Reach</div></div>
+          <div class="stat-card"><div class="value">${formatNum(stats.avg_followers)}</div><div class="label">Avg Followers</div></div>
+          <div class="stat-card"><div class="value">${avgEngagement}%</div><div class="label">Avg Engagement</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.macro}</div><div class="label">Macro (200K+)</div></div>
+          <div class="stat-card"><div class="value">${tierCounts['mid-tier']}</div><div class="label">Mid-tier</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.micro}</div><div class="label">Micro</div></div>
+          <div class="stat-card"><div class="value">${tierCounts.nano}</div><div class="label">Nano</div></div>
+        `;
+      }
     }
 
     // ========== FILTER CHIPS ==========
     function renderFilterChips() {
+      const data = activeCreators();
       const tierCounts = { macro: 0, 'mid-tier': 0, micro: 0, nano: 0 };
-      creators.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
+      data.forEach(c => { if (c.tier) tierCounts[c.tier]++; });
 
-      const tierLabels = {
-        all: 'All',
-        macro: 'Macro (200K+)',
-        'mid-tier': 'Mid-tier (50K-200K)',
-        micro: 'Micro (10K-50K)',
-        nano: 'Nano (<10K)'
-      };
+      const tierLabels = isYt()
+        ? { all: 'All', macro: 'Macro (1M+)', 'mid-tier': 'Mid-tier (100K-1M)', micro: 'Micro (10K-100K)', nano: 'Nano (<10K)' }
+        : { all: 'All', macro: 'Macro (200K+)', 'mid-tier': 'Mid-tier (50K-200K)', micro: 'Micro (10K-50K)', nano: 'Nano (<10K)' };
 
       let tierHtml = '';
       for (const [key, label] of Object.entries(tierLabels)) {
-        const count = key === 'all' ? creators.length : tierCounts[key];
-        const activeClass = activeTierFilter === key ? 'active' : '';
-        tierHtml += `<div class="chip ${activeClass}" data-tier="${key}">${label}<span class="count">(${count})</span></div>`;
+        const count = key === 'all' ? data.length : tierCounts[key];
+        tierHtml += `<div class="chip ${activeTierFilter === key ? 'active' : ''}" data-tier="${key}">${label}<span class="count">(${count})</span></div>`;
       }
       document.getElementById('tier-filters').innerHTML = tierHtml;
 
-      // Niche chips
       const nicheCounts = {};
-      creators.forEach(c => {
-        (c.niches || []).forEach(n => { nicheCounts[n] = (nicheCounts[n] || 0) + 1; });
-      });
+      data.forEach(c => { (c.niches || []).forEach(n => { nicheCounts[n] = (nicheCounts[n] || 0) + 1; }); });
       const sortedNiches = Object.entries(nicheCounts).sort((a, b) => b[1] - a[1]);
-
       let nicheHtml = `<div class="chip ${activeNicheFilter === 'all' ? 'active' : ''}" data-niche="all">All Niches</div>`;
       for (const [niche, count] of sortedNiches) {
-        const activeClass = activeNicheFilter === niche ? 'active' : '';
-        nicheHtml += `<div class="chip ${activeClass}" data-niche="${niche}">${niche}<span class="count">(${count})</span></div>`;
+        nicheHtml += `<div class="chip ${activeNicheFilter === niche ? 'active' : ''}" data-niche="${niche}">${niche}<span class="count">(${count})</span></div>`;
       }
       document.getElementById('niche-filters').innerHTML = nicheHtml;
 
-      // Attach events
       document.querySelectorAll('[data-tier]').forEach(chip => {
-        chip.addEventListener('click', () => {
-          activeTierFilter = chip.dataset.tier;
-          renderFilterChips();
-          render();
-        });
+        chip.addEventListener('click', () => { activeTierFilter = chip.dataset.tier; renderFilterChips(); render(); });
       });
       document.querySelectorAll('[data-niche]').forEach(chip => {
-        chip.addEventListener('click', () => {
-          activeNicheFilter = chip.dataset.niche;
-          renderFilterChips();
-          render();
-        });
+        chip.addEventListener('click', () => { activeNicheFilter = chip.dataset.niche; renderFilterChips(); render(); });
       });
     }
 
     // ========== CREATOR CARDS ==========
     function renderCard(c) {
-      const avatarHtml = `<img class="avatar" src="/avatars/${c.username}.jpg" alt="${c.username}" onerror="this.outerHTML='<div class=\\'avatar-fallback\\'>${c.username[0].toUpperCase()}</div>'">`;
+      const campStatuses = activeCampaignStatuses();
+      const idKey = isYt() ? c.channel_id : c.username;
+      const displayName = isYt() ? (c.channel_name || c.handle || 'Unknown') : c.username;
+      const avatarSrc = isYt() ? `/yt-avatars/${c.channel_id}.jpg` : `/avatars/${c.username}.jpg`;
+      const profileUrl = isYt() ? (c.channel_url || '#') : `https://www.instagram.com/${c.username}/`;
+      const bio = isYt() ? (c.description || '') : (c.biography || '');
+      const initial = displayName[0]?.toUpperCase() || '?';
+
+      const avatarHtml = `<img class="avatar" src="${avatarSrc}" alt="${displayName}" onerror="this.outerHTML='<div class=\\'avatar-fallback\\'>${initial}</div>'">`;
       const verifiedHtml = c.is_verified ? '<span class="verified-badge">&#10003;</span>' : '';
-      const categoryHtml = c.business_category ? `<div class="category">${c.business_category}</div>` : '';
-      const bio = c.biography || '';
 
       const tierClass = c.tier ? `tier-${c.tier}` : '';
       const tierLabel = c.tier ? c.tier.replace('-', ' ') : '';
       const tierHtml = c.tier ? `<span class="tier-badge ${tierClass}">${tierLabel}</span>` : '';
 
-      const campaignStatus = campaignStatuses[c.username];
-      const dotHtml = campaignStatus ? `<span class="campaign-dot dot-${campaignStatus}" title="${campaignStatus.replace('_', ' ')}"></span>` : '';
+      const campaignStatus = campStatuses[idKey];
+      const dotHtml = campaignStatus ? `<span class="campaign-dot dot-${campaignStatus}" title="${campaignStatus.replace(/_/g, ' ')}"></span>` : '';
 
       const nichesHtml = (c.niches && c.niches.length > 0)
-        ? `<div class="niche-tags">${c.niches.map(n => `<span class="niche-tag">${n}</span>`).join('')}</div>`
-        : '';
+        ? `<div class="niche-tags">${c.niches.map(n => `<span class="niche-tag">${n}</span>`).join('')}</div>` : '';
 
-      const inCampaign = campaignStatuses[c.username];
-      const actionHtml = !inCampaign
-        ? `<div class="card-actions"><button class="add-campaign-btn" data-username="${c.username}">+ Add to Campaign</button></div>`
-        : '';
+      const actionHtml = !campaignStatus
+        ? `<div class="card-actions"><button class="add-campaign-btn" data-id="${idKey}">+ Add to Campaign</button></div>` : '';
+
+      let statsHtml;
+      if (isYt()) {
+        statsHtml = `
+          <div class="card-stat"><div class="num">${formatNum(c.subscribers)}</div><div class="lbl">Subscribers</div></div>
+          <div class="card-stat"><div class="num">${formatNum(c.total_views)}</div><div class="lbl">Views</div></div>
+          <div class="card-stat"><div class="num">${formatNum(c.video_count)}</div><div class="lbl">Videos</div></div>
+          <div class="card-stat"><div class="num">${c.engagement_rate ?? 0}%</div><div class="lbl">Engagement</div></div>
+        `;
+      } else {
+        statsHtml = `
+          <div class="card-stat"><div class="num">${formatNum(c.followers)}</div><div class="lbl">Followers</div></div>
+          <div class="card-stat"><div class="num">${formatNum(c.following)}</div><div class="lbl">Following</div></div>
+          <div class="card-stat"><div class="num">${formatNum(c.posts_count)}</div><div class="lbl">Posts</div></div>
+          <div class="card-stat"><div class="num">${c.engagement_rate ?? 0}%</div><div class="lbl">Engagement</div></div>
+        `;
+      }
+
+      const namePrefix = isYt() ? '' : '@';
+      const handleLine = isYt() && c.handle ? `<div class="fullname">@${c.handle}</div>` : '';
+      const fullnameLine = !isYt() ? `<div class="fullname">${c.full_name || ''}</div>` : '';
+      const categoryHtml = !isYt() && c.business_category ? `<div class="category">${c.business_category}</div>` : '';
 
       return `
         <div class="card">
           <div class="card-header">
             ${avatarHtml}
             <div class="card-identity">
-              <a class="username" href="https://www.instagram.com/${c.username}/" target="_blank" rel="noopener">
-                @${c.username} ${verifiedHtml}
+              <a class="username" href="${profileUrl}" target="_blank" rel="noopener">
+                ${namePrefix}${displayName} ${verifiedHtml}
               </a>
               ${tierHtml}${dotHtml}
-              <div class="fullname">${c.full_name || ''}</div>
-              ${categoryHtml}
+              ${handleLine}${fullnameLine}${categoryHtml}
             </div>
           </div>
           ${bio ? `<div class="card-bio">${bio.replace(/\n/g, '<br>')}</div>` : ''}
           ${nichesHtml}
           ${actionHtml}
-          <div class="card-stats">
-            <div class="card-stat"><div class="num">${formatNum(c.followers)}</div><div class="lbl">Followers</div></div>
-            <div class="card-stat"><div class="num">${formatNum(c.following)}</div><div class="lbl">Following</div></div>
-            <div class="card-stat"><div class="num">${formatNum(c.posts_count)}</div><div class="lbl">Posts</div></div>
-            <div class="card-stat"><div class="num">${c.engagement_rate ?? 0}%</div><div class="lbl">Engagement</div></div>
-          </div>
+          <div class="card-stats">${statsHtml}</div>
         </div>
       `;
     }
@@ -616,11 +676,13 @@
     function getFiltered() {
       const q = document.getElementById('search').value.toLowerCase();
       const sort = document.getElementById('sort').value;
+      const data = activeCreators();
 
-      let filtered = creators.filter(c => {
-        const matchesSearch = c.username.toLowerCase().includes(q) ||
-          (c.full_name || '').toLowerCase().includes(q) ||
-          (c.biography || '').toLowerCase().includes(q);
+      let filtered = data.filter(c => {
+        const searchText = isYt()
+          ? `${c.channel_name || ''} ${c.handle || ''} ${c.description || ''}`.toLowerCase()
+          : `${c.username} ${c.full_name || ''} ${c.biography || ''}`.toLowerCase();
+        const matchesSearch = searchText.includes(q);
         const matchesTier = activeTierFilter === 'all' || c.tier === activeTierFilter;
         const matchesNiche = activeNicheFilter === 'all' || (c.niches && c.niches.includes(activeNicheFilter));
         return matchesSearch && matchesTier && matchesNiche;
@@ -629,11 +691,20 @@
       const [field, dir] = sort.split('-');
       filtered.sort((a, b) => {
         let va, vb;
-        if (field === 'followers') { va = a.followers; vb = b.followers; }
-        else if (field === 'posts') { va = a.posts_count; vb = b.posts_count; }
-        else if (field === 'engagement') { va = a.engagement_rate || 0; vb = b.engagement_rate || 0; }
-        else { va = (a.full_name || a.username).toLowerCase(); vb = (b.full_name || b.username).toLowerCase(); }
-
+        if (field === 'followers' || field === 'subscribers') {
+          va = a.followers ?? a.subscribers ?? 0;
+          vb = b.followers ?? b.subscribers ?? 0;
+        } else if (field === 'posts' || field === 'videos') {
+          va = a.posts_count ?? a.video_count ?? 0;
+          vb = b.posts_count ?? b.video_count ?? 0;
+        } else if (field === 'views') {
+          va = a.total_views ?? 0; vb = b.total_views ?? 0;
+        } else if (field === 'engagement') {
+          va = a.engagement_rate || 0; vb = b.engagement_rate || 0;
+        } else {
+          va = (a.full_name || a.channel_name || a.username || a.handle || '').toLowerCase();
+          vb = (b.full_name || b.channel_name || b.username || b.handle || '').toLowerCase();
+        }
         if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
         return dir === 'asc' ? va - vb : vb - va;
       });
@@ -654,16 +725,17 @@
         grid.innerHTML = filtered.map(renderCard).join('');
       }
 
-      // Attach add-to-campaign buttons
       document.querySelectorAll('.add-campaign-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const username = btn.dataset.username;
-          await fetch(`/api/campaigns/${username}`, {
+          const id = btn.dataset.id;
+          const endpoint = isYt() ? `/api/yt/campaigns/${id}` : `/api/campaigns/${id}`;
+          await fetch(endpoint, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'not_contacted', notes: '' })
           });
-          campaignStatuses[username] = 'not_contacted';
+          if (isYt()) ytCampaignStatuses[id] = 'not_contacted';
+          else campaignStatuses[id] = 'not_contacted';
           render();
           loadCampaigns();
         });
@@ -710,6 +782,18 @@
       document.getElementById('goal-current').textContent = formatMoney(revenue);
     }
 
+    function updateReachForPlatform() {
+      const data = activeCreators();
+      const reachField = isYt() ? 'subscribers' : 'followers';
+      const label = isYt() ? 'Avg Subscriber Reach per Creator' : 'Avg Audience Reach per Creator';
+      document.getElementById('reach-label').childNodes[0].textContent = label + ' ';
+      if (data.length > 0) {
+        const avgReach = Math.round(data.reduce((sum, c) => sum + (c[reachField] || 0), 0) / data.length);
+        document.getElementById('calc-reach').value = avgReach;
+      }
+      updateCalc();
+    }
+
     function setScenario(name) {
       const s = scenarios[name];
       document.getElementById('calc-viewrate').value = s.viewrate;
@@ -732,80 +816,73 @@
     });
 
     // ========== CAMPAIGN TRACKER ==========
-    let allCampaigns = [];
-
     async function loadCampaigns() {
+      const base = isYt() ? '/api/yt' : '/api';
       const [campaigns, stats] = await Promise.all([
-        fetch('/api/campaigns').then(r => r.json()),
-        fetch('/api/campaigns/stats').then(r => r.json())
+        fetch(`${base}/campaigns`).then(r => r.json()),
+        fetch(`${base}/campaigns/stats`).then(r => r.json())
       ]);
-      allCampaigns = campaigns;
 
-      // Update campaignStatuses lookup
-      campaignStatuses = {};
-      campaigns.forEach(c => { campaignStatuses[c.username] = c.status; });
+      // Update lookup
+      if (isYt()) {
+        ytCampaignStatuses = {};
+        campaigns.forEach(c => { ytCampaignStatuses[c.channel_id] = c.status; });
+      } else {
+        campaignStatuses = {};
+        campaigns.forEach(c => { campaignStatuses[c.username] = c.status; });
+      }
 
-      // Pipeline stats
       const total = stats.total || 1;
       document.getElementById('pipeline-stats').innerHTML = `
-        <div class="pipeline-stat ps-not_contacted">
-          <div class="ps-value">${stats.not_contacted}</div>
-          <div class="ps-label">Not Contacted</div>
-          <div class="ps-pct">${total > 0 ? Math.round(stats.not_contacted / total * 100) : 0}%</div>
-        </div>
-        <div class="pipeline-stat ps-contacted">
-          <div class="ps-value">${stats.contacted}</div>
-          <div class="ps-label">Contacted</div>
-          <div class="ps-pct">${total > 0 ? Math.round(stats.contacted / total * 100) : 0}%</div>
-        </div>
-        <div class="pipeline-stat ps-confirmed">
-          <div class="ps-value">${stats.confirmed}</div>
-          <div class="ps-label">Confirmed</div>
-          <div class="ps-pct">${total > 0 ? Math.round(stats.confirmed / total * 100) : 0}%</div>
-        </div>
-        <div class="pipeline-stat ps-content_posted">
-          <div class="ps-value">${stats.content_posted}</div>
-          <div class="ps-label">Content Posted</div>
-          <div class="ps-pct">${total > 0 ? Math.round(stats.content_posted / total * 100) : 0}%</div>
-        </div>
+        <div class="pipeline-stat ps-not_contacted"><div class="ps-value">${stats.not_contacted}</div><div class="ps-label">Not Contacted</div><div class="ps-pct">${total > 0 ? Math.round(stats.not_contacted / total * 100) : 0}%</div></div>
+        <div class="pipeline-stat ps-contacted"><div class="ps-value">${stats.contacted}</div><div class="ps-label">Contacted</div><div class="ps-pct">${total > 0 ? Math.round(stats.contacted / total * 100) : 0}%</div></div>
+        <div class="pipeline-stat ps-confirmed"><div class="ps-value">${stats.confirmed}</div><div class="ps-label">Confirmed</div><div class="ps-pct">${total > 0 ? Math.round(stats.confirmed / total * 100) : 0}%</div></div>
+        <div class="pipeline-stat ps-content_posted"><div class="ps-value">${stats.content_posted}</div><div class="ps-label">Content Posted</div><div class="ps-pct">${total > 0 ? Math.round(stats.content_posted / total * 100) : 0}%</div></div>
       `;
 
-      // Pipeline columns
       const statuses = ['not_contacted', 'contacted', 'confirmed', 'content_posted'];
       const statusLabels = { not_contacted: 'Not Contacted', contacted: 'Contacted', confirmed: 'Confirmed', content_posted: 'Content Posted' };
+
       statuses.forEach(status => {
         const items = campaigns.filter(c => c.status === status);
         document.getElementById(`count-${status}`).textContent = items.length;
         document.getElementById(`list-${status}`).innerHTML = items.map(c => {
-          const avatarHtml = `<img class="avatar-small" src="/avatars/${c.username}.jpg" onerror="this.outerHTML='<div class=\\'avatar-fallback-small\\'>${c.username[0].toUpperCase()}</div>'">`;
+          const idKey = isYt() ? c.channel_id : c.username;
+          const displayName = isYt() ? (c.channel_name || idKey) : c.username;
+          const avatarSrc = isYt() ? `/yt-avatars/${c.channel_id}.jpg` : `/avatars/${c.username}.jpg`;
+          const initial = displayName[0]?.toUpperCase() || '?';
+          const metricVal = isYt() ? c.subscribers : c.followers;
+          const metricLabel = isYt() ? 'subscribers' : 'followers';
+          const avatarHtml = `<img class="avatar-small" src="${avatarSrc}" onerror="this.outerHTML='<div class=\\'avatar-fallback-small\\'>${initial}</div>'">`;
+
           return `
-            <div class="pipeline-card" data-username="${c.username}">
+            <div class="pipeline-card" data-id="${idKey}">
               <div class="pipeline-card-row">
                 ${avatarHtml}
                 <div class="pc-info">
-                  <div class="pc-username">@${c.username}</div>
-                  <div class="pc-followers">${formatNum(c.followers)} followers</div>
+                  <div class="pc-username">${isYt() ? '' : '@'}${displayName}</div>
+                  <div class="pc-followers">${formatNum(metricVal)} ${metricLabel}</div>
                 </div>
               </div>
               ${c.notes ? `<div class="pc-notes">${c.notes}</div>` : ''}
-              <select class="status-select" data-username="${c.username}">
+              <select class="status-select" data-id="${idKey}">
                 ${statuses.map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${statusLabels[s]}</option>`).join('')}
               </select>
-              <textarea class="notes-input" data-username="${c.username}" placeholder="Add notes...">${c.notes || ''}</textarea>
-              <button class="save-btn" data-username="${c.username}">Save</button>
+              <textarea class="notes-input" data-id="${idKey}" placeholder="Add notes...">${c.notes || ''}</textarea>
+              <button class="save-btn" data-id="${idKey}">Save</button>
             </div>
           `;
         }).join('');
       });
 
-      // Attach save events
       document.querySelectorAll('.pipeline-card .save-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const username = btn.dataset.username;
+          const id = btn.dataset.id;
           const card = btn.closest('.pipeline-card');
           const newStatus = card.querySelector('.status-select').value;
           const notes = card.querySelector('.notes-input').value;
-          await fetch(`/api/campaigns/${username}`, {
+          const endpoint = isYt() ? `/api/yt/campaigns/${id}` : `/api/campaigns/${id}`;
+          await fetch(endpoint, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus, notes })
@@ -814,6 +891,113 @@
           render();
         });
       });
+    }
+
+    // ========== METHODOLOGY ==========
+    function renderMethodology() {
+      const el = document.getElementById('methodology-content');
+      if (isYt()) {
+        el.innerHTML = `
+          <h2>Understanding YouTube Engagement Rate</h2>
+          <p>YouTube engagement rate measures how actively a channel's viewers interact with their content through likes and comments, relative to the number of views each video receives.</p>
+
+          <h3>The Formula</h3>
+          <div class="formula-box">
+            <div class="formula">(Avg Likes + Avg Comments) / Avg Views &times; 100</div>
+            <div class="formula-note">Calculated across the channel's recent videos</div>
+          </div>
+
+          <p>We average the likes, comments, and views across a channel's recent videos, then compute the engagement percentage. This gives a fair comparison between channels with different upload frequencies.</p>
+
+          <p><strong>For example:</strong> if a channel averages 50,000 views, 2,000 likes, and 300 comments per video:</p>
+          <div class="formula-box">
+            <div class="formula">(2,000 + 300) / 50,000 &times; 100 = 4.6%</div>
+          </div>
+
+          <h3>What the Numbers Mean</h3>
+          <table class="scale-table">
+            <thead><tr><th>Engagement Rate</th><th>What It Means</th></tr></thead>
+            <tbody>
+              <tr><td class="rate">Less than 1%</td><td>Low engagement &mdash; viewers watch but rarely interact</td></tr>
+              <tr><td class="rate">1% &ndash; 3%</td><td>Average &mdash; typical for most YouTube channels</td></tr>
+              <tr><td class="rate">3% &ndash; 7%</td><td>Good &mdash; strong community engagement</td></tr>
+              <tr><td class="rate">Above 7%</td><td>Excellent &mdash; highly engaged niche audience</td></tr>
+            </tbody>
+          </table>
+
+          <h3>YouTube Tier Classification</h3>
+          <table class="scale-table">
+            <thead><tr><th>Tier</th><th>Subscriber Range</th></tr></thead>
+            <tbody>
+              <tr><td class="rate">Macro</td><td>1,000,000+ subscribers</td></tr>
+              <tr><td class="rate">Mid-tier</td><td>100,000 &ndash; 999,999 subscribers</td></tr>
+              <tr><td class="rate">Micro</td><td>10,000 &ndash; 99,999 subscribers</td></tr>
+              <tr><td class="rate">Nano</td><td>Under 10,000 subscribers</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Why It Matters</h3>
+          <p>YouTube engagement is a strong signal of audience trust. A channel with 20K subscribers and 5% engagement may drive more conversions than one with 500K subscribers and 0.3% engagement, because their audience actively participates.</p>
+
+          <h3>What's Not Included</h3>
+          <div class="note-box">
+            YouTube also tracks <strong>shares</strong>, <strong>saves</strong>, and <strong>watch time</strong> as engagement metrics, but these are only available to the channel owner via YouTube Studio. Our calculation uses the publicly visible metrics: likes, comments, and views.
+          </div>
+        `;
+      } else {
+        el.innerHTML = `
+          <h2>Understanding Engagement Rate</h2>
+          <p>Engagement rate measures how actively a creator's audience interacts with their content. Instead of just looking at how many followers someone has, engagement rate tells you how many of those followers actually pay attention.</p>
+
+          <h3>The Formula</h3>
+          <div class="formula-box">
+            <div class="formula">(Likes + Comments) / Followers &times; 100</div>
+            <div class="formula-note">Result is shown as a percentage</div>
+          </div>
+
+          <p>We add up all the likes and comments across a creator's recent posts, then divide by their follower count. The result is multiplied by 100 to express it as a percentage.</p>
+
+          <p><strong>For example:</strong> if a creator has 10,000 followers and their recent posts received a total of 1,500 likes and 200 comments, their engagement rate would be:</p>
+          <div class="formula-box">
+            <div class="formula">(1,500 + 200) / 10,000 &times; 100 = 17%</div>
+          </div>
+
+          <h3>What the Numbers Mean</h3>
+          <table class="scale-table">
+            <thead><tr><th>Engagement Rate</th><th>What It Means</th></tr></thead>
+            <tbody>
+              <tr><td class="rate">Less than 1%</td><td>Low engagement &mdash; the audience is mostly passive or the account may have inflated follower counts</td></tr>
+              <tr><td class="rate">1% &ndash; 3%</td><td>Average &mdash; typical for larger accounts where a smaller share of followers interact</td></tr>
+              <tr><td class="rate">3% &ndash; 6%</td><td>Good &mdash; the creator has a responsive, interested audience</td></tr>
+              <tr><td class="rate">Above 6%</td><td>Excellent &mdash; strong community connection, common with smaller or niche creators</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Why It Matters</h3>
+          <p>A creator with 5,000 followers and a 10% engagement rate may be more valuable for partnerships than one with 100,000 followers and a 0.5% rate. High engagement means the audience trusts the creator and is likely to act on their recommendations.</p>
+
+          <h3>What's Not Included</h3>
+          <div class="note-box">
+            The full engagement formula ideally includes <strong>shares</strong> and <strong>saves</strong> in addition to likes and comments. However, Instagram does not make share and save counts publicly available &mdash; only the account owner can see those numbers. Our calculation uses the two metrics that are publicly accessible: likes and comments.
+          </div>
+        `;
+      }
+    }
+
+    // ========== RENDER ALL ==========
+    async function renderAll() {
+      const statsEndpoint = isYt() ? '/api/yt/stats' : '/api/stats';
+      const stats = await fetch(statsEndpoint).then(r => r.json());
+      renderStats(stats);
+      renderFilterChips();
+      renderSortOptions();
+      render();
+      updateReachForPlatform();
+      renderMethodology();
+      // Refresh campaigns if that tab is active
+      if (document.getElementById('tab-campaigns').classList.contains('active')) {
+        loadCampaigns();
+      }
     }
 
     // ========== TABS ==========
@@ -827,8 +1011,20 @@
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
         if (tab.dataset.tab === 'campaigns') loadCampaigns();
+        if (tab.dataset.tab === 'methodology') renderMethodology();
       });
     });
+
+    // ========== LOAD YOUTUBE DATA (lazy) ==========
+    async function loadYtData() {
+      const [ytCreatorsRes, ytCampaignsRes] = await Promise.all([
+        fetch('/api/yt/creators').then(r => r.json()),
+        fetch('/api/yt/campaigns').then(r => r.json()),
+      ]);
+      ytCreators = ytCreatorsRes;
+      ytCampaignsRes.forEach(c => { ytCampaignStatuses[c.channel_id] = c.status; });
+      ytDataLoaded = true;
+    }
 
     // ========== INIT ==========
     async function init() {
@@ -840,16 +1036,12 @@
       creators = creatorsRes;
       campaignsRes.forEach(c => { campaignStatuses[c.username] = c.status; });
 
-      renderStats(statsRes, creators);
+      renderSortOptions();
+      renderStats(statsRes);
       renderFilterChips();
       render();
-
-      // Auto-fill average reach for revenue calculator
-      if (creators.length > 0) {
-        const avgReach = Math.round(creators.reduce((sum, c) => sum + c.followers, 0) / creators.length);
-        document.getElementById('calc-reach').value = avgReach;
-      }
-      updateCalc();
+      renderMethodology();
+      updateReachForPlatform();
     }
 
     init();

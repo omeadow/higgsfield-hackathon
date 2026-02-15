@@ -131,7 +131,7 @@ async function main() {
   fs.writeFileSync("data/creator_summary.json", JSON.stringify(summary, null, 2));
 
   // Step 5: Summary
-  console.log("=== DONE ===");
+  console.log("=== INSTAGRAM DONE ===");
   console.log(`Total profiles scraped: ${allProfiles.length}`);
   console.log(`Total posts collected: ${allPosts.length}`);
   console.log("\nTop 10 creators by followers:");
@@ -141,6 +141,11 @@ async function main() {
     .forEach((c) => {
       console.log(`  @${c.username} - ${c.followers?.toLocaleString() ?? "?"} followers`);
     });
+
+  // Step 6: YouTube scraping
+  console.log("\n=== YOUTUBE SCRAPING ===\n");
+  const ytScrape = require("./yt_scrape");
+  await ytScrape.main();
 }
 
 main().catch(console.error);

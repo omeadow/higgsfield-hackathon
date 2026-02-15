@@ -47,6 +47,44 @@ db.exec(`
     notes TEXT DEFAULT '',
     updated_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS yt_creators (
+    channel_id TEXT PRIMARY KEY,
+    channel_name TEXT,
+    handle TEXT,
+    description TEXT,
+    subscribers INTEGER DEFAULT 0,
+    total_views INTEGER DEFAULT 0,
+    video_count INTEGER DEFAULT 0,
+    is_verified INTEGER DEFAULT 0,
+    channel_url TEXT,
+    thumbnail_url TEXT,
+    country TEXT,
+    joined_date TEXT,
+    scraped_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS yt_videos (
+    video_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    title TEXT,
+    description TEXT,
+    url TEXT,
+    views INTEGER DEFAULT 0,
+    likes INTEGER DEFAULT 0,
+    comments INTEGER DEFAULT 0,
+    duration TEXT,
+    published_at TEXT,
+    thumbnail_url TEXT,
+    FOREIGN KEY (channel_id) REFERENCES yt_creators(channel_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS yt_campaigns (
+    channel_id TEXT PRIMARY KEY REFERENCES yt_creators(channel_id),
+    status TEXT DEFAULT 'not_contacted',
+    notes TEXT DEFAULT '',
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 const upsertCreatorStmt = db.prepare(`
@@ -219,6 +257,141 @@ function getCampaignStats() {
   `).get();
 }
 
+// ========== YOUTUBE ==========
+
+const upsertYtCreatorStmt = db.prepare(`
+  INSERT INTO yt_creators (channel_id, channel_name, handle, description, subscribers, total_views,
+    video_count, is_verified, channel_url, thumbnail_url, country, joined_date, scraped_at)
+  VALUES (@channel_id, @channel_name, @handle, @description, @subscribers, @total_views,
+    @video_count, @is_verified, @channel_url, @thumbnail_url, @country, @joined_date, datetime('now'))
+  ON CONFLICT(channel_id) DO UPDATE SET
+    channel_name=@channel_name, handle=@handle, description=@description, subscribers=@subscribers,
+    total_views=@total_views, video_count=@video_count, is_verified=@is_verified,
+    channel_url=@channel_url, thumbnail_url=@thumbnail_url, country=@country,
+    joined_date=@joined_date, scraped_at=datetime('now')
+`);
+
+const upsertYtVideoStmt = db.prepare(`
+  INSERT INTO yt_videos (video_id, channel_id, title, description, url, views, likes, comments,
+    duration, published_at, thumbnail_url)
+  VALUES (@video_id, @channel_id, @title, @description, @url, @views, @likes, @comments,
+    @duration, @published_at, @thumbnail_url)
+  ON CONFLICT(video_id) DO UPDATE SET
+    title=@title, description=@description, views=@views, likes=@likes,
+    comments=@comments, thumbnail_url=@thumbnail_url
+`);
+
+function upsertYtCreator(channel) {
+  upsertYtCreatorStmt.run({
+    channel_id: channel.channelId || channel.id,
+    channel_name: channel.channelName || channel.name || null,
+    handle: channel.handle || channel.userName || null,
+    description: channel.description || channel.channelDescription || null,
+    subscribers: channel.subscriberCount ?? channel.subscribers ?? 0,
+    total_views: channel.viewCount ?? channel.totalViews ?? 0,
+    video_count: channel.videoCount ?? channel.videos ?? 0,
+    is_verified: channel.isVerified ? 1 : 0,
+    channel_url: channel.channelUrl || channel.url || null,
+    thumbnail_url: channel.thumbnailUrl || channel.profilePicUrl || null,
+    country: channel.country || null,
+    joined_date: channel.joinedDate || null,
+  });
+}
+
+function upsertYtVideo(video, channelId) {
+  upsertYtVideoStmt.run({
+    video_id: video.videoId || video.id,
+    channel_id: channelId,
+    title: video.title || null,
+    description: video.description || null,
+    url: video.url || null,
+    views: video.viewCount ?? video.views ?? 0,
+    likes: video.likeCount ?? video.likes ?? 0,
+    comments: video.commentCount ?? video.comments ?? 0,
+    duration: video.duration || null,
+    published_at: video.publishedAt || video.date || null,
+    thumbnail_url: video.thumbnailUrl || null,
+  });
+}
+
+function getYtCreatorsWithEngagement() {
+  const rows = db.prepare(`
+    SELECT c.*,
+      COALESCE(AVG(v.views), 0) as avg_views,
+      COALESCE(AVG(v.likes), 0) as avg_likes,
+      COALESCE(AVG(v.comments), 0) as avg_comments,
+      CASE WHEN COALESCE(AVG(v.views), 0) > 0
+        THEN ROUND((COALESCE(AVG(v.likes), 0) + COALESCE(AVG(v.comments), 0)) * 100.0 / AVG(v.views), 2)
+        ELSE 0 END as engagement_rate,
+      CASE
+        WHEN c.subscribers >= 1000000 THEN 'macro'
+        WHEN c.subscribers >= 100000 THEN 'mid-tier'
+        WHEN c.subscribers >= 10000 THEN 'micro'
+        ELSE 'nano'
+      END as tier
+    FROM yt_creators c
+    LEFT JOIN yt_videos v ON c.channel_id = v.channel_id
+    GROUP BY c.channel_id
+    ORDER BY c.subscribers DESC
+  `).all();
+  return rows.map(row => ({ ...row, niches: extractNiches(row.description) }));
+}
+
+function getYtCreatorByChannelId(channelId) {
+  return db.prepare("SELECT * FROM yt_creators WHERE channel_id = ?").get(channelId);
+}
+
+function getVideosByChannel(channelId) {
+  return db.prepare("SELECT * FROM yt_videos WHERE channel_id = ? ORDER BY published_at DESC").all(channelId);
+}
+
+function getYtStats() {
+  return db.prepare(`
+    SELECT
+      COUNT(*) as total_channels,
+      COALESCE(SUM(subscribers), 0) as total_subscribers,
+      ROUND(AVG(subscribers)) as avg_subscribers,
+      MAX(subscribers) as max_subscribers,
+      SUM(is_verified) as verified_count,
+      COALESCE(SUM(video_count), 0) as total_videos
+    FROM yt_creators
+  `).get();
+}
+
+function getYtCampaignStatus(channelId) {
+  return db.prepare("SELECT * FROM yt_campaigns WHERE channel_id = ?").get(channelId);
+}
+
+function updateYtCampaignStatus(channelId, status, notes) {
+  db.prepare(`
+    INSERT INTO yt_campaigns (channel_id, status, notes, updated_at)
+    VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(channel_id) DO UPDATE SET
+      status = ?, notes = ?, updated_at = datetime('now')
+  `).run(channelId, status, notes || '', status, notes || '');
+}
+
+function getAllYtCampaignStatuses() {
+  return db.prepare(`
+    SELECT cam.*, c.channel_name, c.subscribers, c.thumbnail_url
+    FROM yt_campaigns cam
+    JOIN yt_creators c ON cam.channel_id = c.channel_id
+    ORDER BY cam.updated_at DESC
+  `).all();
+}
+
+function getYtCampaignStats() {
+  return db.prepare(`
+    SELECT
+      COALESCE(SUM(CASE WHEN status = 'not_contacted' THEN 1 ELSE 0 END), 0) as not_contacted,
+      COALESCE(SUM(CASE WHEN status = 'contacted' THEN 1 ELSE 0 END), 0) as contacted,
+      COALESCE(SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END), 0) as confirmed,
+      COALESCE(SUM(CASE WHEN status = 'content_posted' THEN 1 ELSE 0 END), 0) as content_posted,
+      COUNT(*) as total
+    FROM yt_campaigns
+  `).get();
+}
+
 module.exports = {
   db,
   upsertCreator,
@@ -232,4 +405,15 @@ module.exports = {
   updateCampaignStatus,
   getAllCampaignStatuses,
   getCampaignStats,
+  // YouTube
+  upsertYtCreator,
+  upsertYtVideo,
+  getYtCreatorsWithEngagement,
+  getYtCreatorByChannelId,
+  getVideosByChannel,
+  getYtStats,
+  getYtCampaignStatus,
+  updateYtCampaignStatus,
+  getAllYtCampaignStatuses,
+  getYtCampaignStats,
 };

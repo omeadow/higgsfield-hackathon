@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "scrape": "node scrape.js",
+    "scrape:yt": "node yt_scrape.js",
     "import": "node import.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
