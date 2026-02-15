@@ -5,7 +5,9 @@ const {
   getAllCampaignStatuses, updateCampaignStatus, getCampaignStats,
   getYtCreatorsWithEngagement, getYtCreatorByChannelId, getVideosByChannel, getYtStats,
   getAllYtCampaignStatuses, updateYtCampaignStatus, getYtCampaignStats,
+  getAllAnalysisResults, getAnalysisResultsByPlatform, getAnalysisStats, clearAnalysisResults,
 } = require("./db");
+const { runAnalysis, getIdealProfiles } = require("./analyze");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -83,6 +85,52 @@ app.put("/api/yt/campaigns/:channelId", (req, res) => {
   }
   updateYtCampaignStatus(channelId, status, notes);
   res.json({ success: true, channelId, status, notes });
+});
+
+// ========== ANALYSIS API ==========
+
+let analysisRunning = false;
+
+app.post("/api/analysis/run", async (req, res) => {
+  if (analysisRunning) {
+    return res.status(409).json({ error: "Analysis already running" });
+  }
+  analysisRunning = true;
+  try {
+    const result = await runAnalysis();
+    res.json(result);
+  } catch (err) {
+    console.error("Analysis error:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    analysisRunning = false;
+  }
+});
+
+app.get("/api/analysis/results", (req, res) => {
+  const { platform } = req.query;
+  if (platform) {
+    res.json(getAnalysisResultsByPlatform(platform));
+  } else {
+    res.json(getAllAnalysisResults());
+  }
+});
+
+app.get("/api/analysis/stats", (req, res) => {
+  res.json(getAnalysisStats());
+});
+
+app.get("/api/analysis/profiles", (req, res) => {
+  try {
+    res.json(getIdealProfiles());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/analysis/results", (req, res) => {
+  clearAnalysisResults();
+  res.json({ success: true });
 });
 
 app.listen(PORT, () => {

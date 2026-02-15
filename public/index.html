@@ -324,6 +324,129 @@
     }
     .add-campaign-btn:hover { background: var(--accent); color: white; }
 
+    /* AI Analytics */
+    .analytics-container {
+      max-width: 1200px; margin: 24px auto; padding: 0 32px;
+    }
+    .analytics-container h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+    .analytics-header {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .analytics-btn {
+      padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .analytics-btn-primary {
+      background: var(--gradient); color: white;
+    }
+    .analytics-btn-primary:hover { opacity: 0.9; }
+    .analytics-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .analytics-btn-danger {
+      background: white; color: #dc2626; border: 1px solid #dc2626;
+    }
+    .analytics-btn-danger:hover { background: #fef2f2; }
+    .analytics-progress {
+      font-size: 13px; color: #65676b; font-style: italic;
+    }
+    .analytics-timestamp {
+      font-size: 12px; color: #65676b; margin-left: auto;
+    }
+    .analytics-summary {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .analytics-summary-card {
+      flex: 1; min-width: 150px; padding: 16px; background: white; border-radius: 10px;
+      text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .analytics-summary-card .as-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .analytics-summary-card .as-label { font-size: 12px; color: #65676b; text-transform: uppercase; margin-top: 4px; }
+
+    .profiles-accordion {
+      background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .profiles-accordion-header {
+      padding: 14px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #e4e6eb;
+    }
+    .profiles-accordion-header:hover { background: #f8f9fb; }
+    .profiles-accordion-body {
+      display: none; padding: 16px 20px;
+    }
+    .profiles-accordion-body.open { display: block; }
+    .profile-item {
+      padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .profile-item:last-child { border-bottom: none; }
+    .profile-item h4 { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+    .profile-item p { font-size: 13px; color: #444; line-height: 1.5; margin: 2px 0; }
+
+    .analytics-filters {
+      display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap;
+    }
+    .analytics-filters select {
+      padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px;
+      background: white; cursor: pointer;
+    }
+
+    .analytics-table-wrap {
+      background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow-x: auto;
+    }
+    .analytics-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .analytics-table th {
+      padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 600;
+      color: #65676b; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 2px solid #e4e6eb; cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .analytics-table th:hover { color: var(--accent); }
+    .analytics-table td {
+      padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle;
+    }
+    .analytics-table tr:hover { background: #f8f9fb; }
+    .platform-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .platform-badge-instagram { background: #fce7f3; color: #be185d; }
+    .platform-badge-youtube { background: #fee2e2; color: #dc2626; }
+    .score-bar {
+      display: inline-block; height: 8px; border-radius: 4px; min-width: 8px;
+    }
+    .score-bar-red { background: #ef4444; }
+    .score-bar-yellow { background: #f59e0b; }
+    .score-bar-green { background: #10b981; }
+    .score-num {
+      display: inline-block; width: 24px; font-weight: 700; text-align: right; margin-right: 6px;
+    }
+    .score-num-red { color: #ef4444; }
+    .score-num-yellow { color: #f59e0b; }
+    .score-num-green { color: #10b981; }
+    .expand-btn {
+      background: none; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;
+      font-size: 11px; padding: 2px 6px; color: #65676b;
+    }
+    .expand-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .expanded-scores {
+      display: none; padding: 8px 14px 12px; background: #f8f9fb;
+    }
+    .expanded-scores.open { display: table-row; }
+    .mini-score-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 12px;
+    }
+    .mini-score-label { width: 220px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-score-bar-bg { flex: 1; height: 6px; background: #e4e6eb; border-radius: 3px; overflow: hidden; max-width: 200px; }
+    .mini-score-bar-fill { height: 100%; border-radius: 3px; }
+    .mini-score-val { width: 24px; text-align: right; font-weight: 600; }
+    .reasoning-text { font-size: 12px; color: #65676b; max-width: 250px; line-height: 1.4; }
+    .analytics-empty {
+      text-align: center; padding: 60px 20px; color: #65676b;
+    }
+    .analytics-empty p { margin-bottom: 16px; font-size: 16px; }
+
     @media (max-width: 900px) {
       .calc-grid { grid-template-columns: 1fr; }
       .pipeline-columns { grid-template-columns: repeat(2, 1fr); }
@@ -355,6 +478,7 @@
     <div class="tab active" data-tab="creators">Creators</div>
     <div class="tab" data-tab="revenue">Revenue Projections</div>
     <div class="tab" data-tab="campaigns">Campaign Tracker</div>
+    <div class="tab" data-tab="analytics">AI Analytics</div>
     <div class="tab" data-tab="methodology">How Engagement Works</div>
   </div>
 
@@ -449,6 +573,37 @@
           <div class="pipeline-list" id="list-content_posted"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- AI Analytics Tab -->
+  <div id="tab-analytics" class="tab-content">
+    <div class="analytics-container">
+      <h2>AI Profile-Fit Analytics</h2>
+      <div class="analytics-header">
+        <button class="analytics-btn analytics-btn-primary" id="run-analysis-btn" onclick="triggerAnalysis()">Run Analysis</button>
+        <button class="analytics-btn analytics-btn-danger" id="clear-analysis-btn" onclick="clearAndRerun()">Clear &amp; Re-run</button>
+        <span class="analytics-progress" id="analysis-progress"></span>
+        <span class="analytics-timestamp" id="analysis-timestamp"></span>
+      </div>
+      <div class="analytics-summary" id="analytics-summary"></div>
+      <div class="profiles-accordion">
+        <div class="profiles-accordion-header" onclick="toggleProfilesAccordion()">
+          Ideal Creator Profiles <span id="accordion-arrow">&#9654;</span>
+        </div>
+        <div class="profiles-accordion-body" id="profiles-accordion-body"></div>
+      </div>
+      <div class="analytics-filters" id="analytics-filters" style="display:none">
+        <select id="filter-profile" onchange="renderAnalyticsTable()">
+          <option value="all">All Profiles</option>
+        </select>
+        <select id="filter-platform-analytics" onchange="renderAnalyticsTable()">
+          <option value="all">All Platforms</option>
+          <option value="instagram">Instagram</option>
+          <option value="youtube">YouTube</option>
+        </select>
+      </div>
+      <div id="analytics-table-container"></div>
     </div>
   </div>
 
@@ -984,6 +1139,266 @@
       }
     }
 
+    // ========== AI ANALYTICS ==========
+    let analysisResults = [];
+    let idealProfiles = [];
+    let analyticsSortField = 'best_fit_score';
+    let analyticsSortDir = 'desc';
+
+    async function loadIdealProfiles() {
+      try {
+        idealProfiles = await fetch('/api/analysis/profiles').then(r => r.json());
+        renderProfilesAccordion();
+      } catch (e) { console.error('Failed to load profiles:', e); }
+    }
+
+    function renderProfilesAccordion() {
+      const body = document.getElementById('profiles-accordion-body');
+      body.innerHTML = idealProfiles.map(p => `
+        <div class="profile-item">
+          <h4>${p.Profile}</h4>
+          <p>${p['Short Description (Audience • Niche • Platform)']}</p>
+          <p><strong>Examples:</strong> ${p['Example Creators']}</p>
+          <p><strong>Scale:</strong> ${p['Audience Scale']}</p>
+        </div>
+      `).join('');
+    }
+
+    function toggleProfilesAccordion() {
+      const body = document.getElementById('profiles-accordion-body');
+      const arrow = document.getElementById('accordion-arrow');
+      body.classList.toggle('open');
+      arrow.innerHTML = body.classList.contains('open') ? '&#9660;' : '&#9654;';
+    }
+
+    async function loadAnalysisResults() {
+      try {
+        const [results, stats] = await Promise.all([
+          fetch('/api/analysis/results').then(r => r.json()),
+          fetch('/api/analysis/stats').then(r => r.json()),
+        ]);
+        analysisResults = results;
+        renderAnalyticsSummary(stats);
+        populateProfileFilter();
+        renderAnalyticsTable();
+        if (results.length > 0) {
+          document.getElementById('analysis-timestamp').textContent =
+            'Last analyzed: ' + new Date(results[0].analyzed_at).toLocaleString();
+        }
+      } catch (e) { console.error('Failed to load analysis:', e); }
+    }
+
+    function renderAnalyticsSummary(stats) {
+      const el = document.getElementById('analytics-summary');
+      if (!stats || stats.total === 0) {
+        el.innerHTML = '';
+        return;
+      }
+      let profileCards = '';
+      if (stats.by_profile) {
+        const top = stats.by_profile.slice(0, 3);
+        profileCards = top.map(p => `
+          <div class="analytics-summary-card">
+            <div class="as-value">${p.count}</div>
+            <div class="as-label">${p.best_fit_profile}</div>
+          </div>
+        `).join('');
+      }
+      el.innerHTML = `
+        <div class="analytics-summary-card">
+          <div class="as-value">${stats.total}</div>
+          <div class="as-label">Total Analyzed</div>
+        </div>
+        <div class="analytics-summary-card">
+          <div class="as-value">${stats.avg_score ?? 0}</div>
+          <div class="as-label">Avg Fit Score</div>
+        </div>
+        ${profileCards}
+      `;
+    }
+
+    function populateProfileFilter() {
+      const select = document.getElementById('filter-profile');
+      const profiles = [...new Set(analysisResults.map(r => r.best_fit_profile))];
+      select.innerHTML = '<option value="all">All Profiles</option>' +
+        profiles.map(p => `<option value="${p}">${p}</option>`).join('');
+    }
+
+    function scoreColor(score) {
+      if (score <= 3) return 'red';
+      if (score <= 6) return 'yellow';
+      return 'green';
+    }
+
+    function renderAnalyticsTable() {
+      const container = document.getElementById('analytics-table-container');
+      const profileFilter = document.getElementById('filter-profile').value;
+      const platformFilter = document.getElementById('filter-platform-analytics').value;
+
+      let data = [...analysisResults];
+      if (profileFilter !== 'all') data = data.filter(r => r.best_fit_profile === profileFilter);
+      if (platformFilter !== 'all') data = data.filter(r => r.platform === platformFilter);
+
+      // Sort
+      data.sort((a, b) => {
+        let va, vb;
+        if (analyticsSortField === 'best_fit_score') {
+          va = a.best_fit_score; vb = b.best_fit_score;
+        } else if (analyticsSortField === 'creator_name') {
+          va = (a.creator_name || '').toLowerCase(); vb = (b.creator_name || '').toLowerCase();
+          return analyticsSortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        } else if (analyticsSortField === 'platform') {
+          va = a.platform; vb = b.platform;
+          return analyticsSortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        } else {
+          va = a.best_fit_score; vb = b.best_fit_score;
+        }
+        return analyticsSortDir === 'asc' ? va - vb : vb - va;
+      });
+
+      if (data.length === 0) {
+        container.innerHTML = `<div class="analytics-empty">
+          <p>No analysis results yet.</p>
+          <p>Click "Run Analysis" to score creators against ideal profiles.</p>
+        </div>`;
+        document.getElementById('analytics-filters').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('analytics-filters').style.display = 'flex';
+
+      const sortArrow = (field) => {
+        if (analyticsSortField !== field) return '';
+        return analyticsSortDir === 'asc' ? ' &#9650;' : ' &#9660;';
+      };
+
+      const profileNames = idealProfiles.map(p => p.Profile);
+
+      let rows = data.map((r, idx) => {
+        const color = scoreColor(r.best_fit_score);
+        const barWidth = r.best_fit_score * 10;
+        let scores = {};
+        try { scores = typeof r.profile_scores === 'string' ? JSON.parse(r.profile_scores) : r.profile_scores; } catch(e) {}
+
+        const miniScores = profileNames.map(name => {
+          const s = scores[name] ?? 0;
+          const c = scoreColor(s);
+          return `<div class="mini-score-row">
+            <span class="mini-score-label">${name}</span>
+            <div class="mini-score-bar-bg"><div class="mini-score-bar-fill score-bar-${c}" style="width:${s*10}%"></div></div>
+            <span class="mini-score-val score-num-${c}">${s}</span>
+          </div>`;
+        }).join('');
+
+        const campStatuses = r.platform === 'youtube' ? ytCampaignStatuses : campaignStatuses;
+        const inCampaign = !!campStatuses[r.creator_id];
+        const addBtn = !inCampaign
+          ? `<button class="add-campaign-btn analytics-add-btn" data-id="${r.creator_id}" data-platform="${r.platform}">+ Campaign</button>`
+          : '<span style="font-size:11px;color:#10b981;">In campaign</span>';
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${r.creator_name || r.creator_id}</strong></td>
+            <td><span class="platform-badge platform-badge-${r.platform}">${r.platform === 'youtube' ? 'YT' : 'IG'}</span></td>
+            <td>${r.best_fit_profile}</td>
+            <td>
+              <span class="score-num score-num-${color}">${r.best_fit_score}</span>
+              <span class="score-bar score-bar-${color}" style="width:${barWidth}px"></span>
+            </td>
+            <td><button class="expand-btn" onclick="toggleScoreRow(this, ${idx})">Scores</button></td>
+            <td class="reasoning-text">${r.reasoning || ''}</td>
+            <td>${addBtn}</td>
+          </tr>
+          <tr class="expanded-scores" id="score-row-${idx}">
+            <td colspan="8" style="padding:12px 20px; background:#f8f9fb;">
+              ${miniScores}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      container.innerHTML = `<div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr>
+          <th>#</th>
+          <th onclick="sortAnalytics('creator_name')">Creator${sortArrow('creator_name')}</th>
+          <th onclick="sortAnalytics('platform')">Platform${sortArrow('platform')}</th>
+          <th>Best Fit Profile</th>
+          <th onclick="sortAnalytics('best_fit_score')">Score${sortArrow('best_fit_score')}</th>
+          <th>Details</th>
+          <th>Reasoning</th>
+          <th>Action</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+
+      // Bind add-to-campaign buttons
+      container.querySelectorAll('.analytics-add-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const platform = btn.dataset.platform;
+          const endpoint = platform === 'youtube' ? `/api/yt/campaigns/${id}` : `/api/campaigns/${id}`;
+          await fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'not_contacted', notes: '' })
+          });
+          if (platform === 'youtube') ytCampaignStatuses[id] = 'not_contacted';
+          else campaignStatuses[id] = 'not_contacted';
+          renderAnalyticsTable();
+        });
+      });
+    }
+
+    function toggleScoreRow(btn, idx) {
+      const row = document.getElementById('score-row-' + idx);
+      row.classList.toggle('open');
+      btn.textContent = row.classList.contains('open') ? 'Hide' : 'Scores';
+    }
+
+    function sortAnalytics(field) {
+      if (analyticsSortField === field) {
+        analyticsSortDir = analyticsSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        analyticsSortField = field;
+        analyticsSortDir = field === 'creator_name' ? 'asc' : 'desc';
+      }
+      renderAnalyticsTable();
+    }
+
+    async function triggerAnalysis() {
+      const btn = document.getElementById('run-analysis-btn');
+      const progress = document.getElementById('analysis-progress');
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      progress.textContent = 'Sending creators to GPT-4o-mini for scoring...';
+
+      try {
+        const res = await fetch('/api/analysis/run', { method: 'POST' });
+        const data = await res.json();
+        if (data.error) {
+          progress.textContent = 'Error: ' + data.error;
+        } else {
+          progress.textContent = `Done! Analyzed ${data.analyzed_count} creators in ${(data.duration_ms / 1000).toFixed(1)}s`;
+          await loadAnalysisResults();
+        }
+      } catch (e) {
+        progress.textContent = 'Error: ' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run Analysis';
+      }
+    }
+
+    async function clearAndRerun() {
+      if (!confirm('Clear all analysis results and re-run?')) return;
+      await fetch('/api/analysis/results', { method: 'DELETE' });
+      analysisResults = [];
+      document.getElementById('analytics-summary').innerHTML = '';
+      renderAnalyticsTable();
+      await triggerAnalysis();
+    }
+
     // ========== RENDER ALL ==========
     async function renderAll() {
       const statsEndpoint = isYt() ? '/api/yt/stats' : '/api/stats';
@@ -1011,6 +1426,7 @@
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
         if (tab.dataset.tab === 'campaigns') loadCampaigns();
+        if (tab.dataset.tab === 'analytics') { loadIdealProfiles(); loadAnalysisResults(); }
         if (tab.dataset.tab === 'methodology') renderMethodology();
       });
     });

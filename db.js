@@ -85,6 +85,18 @@ db.exec(`
     notes TEXT DEFAULT '',
     updated_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS analysis_results (
+    id TEXT PRIMARY KEY,
+    platform TEXT NOT NULL,
+    creator_id TEXT NOT NULL,
+    creator_name TEXT,
+    profile_scores TEXT,
+    best_fit_profile TEXT,
+    best_fit_score INTEGER,
+    reasoning TEXT,
+    analyzed_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 const upsertCreatorStmt = db.prepare(`
@@ -380,6 +392,52 @@ function getAllYtCampaignStatuses() {
   `).all();
 }
 
+// ========== ANALYSIS ==========
+
+const upsertAnalysisResultStmt = db.prepare(`
+  INSERT INTO analysis_results (id, platform, creator_id, creator_name, profile_scores, best_fit_profile, best_fit_score, reasoning, analyzed_at)
+  VALUES (@id, @platform, @creator_id, @creator_name, @profile_scores, @best_fit_profile, @best_fit_score, @reasoning, datetime('now'))
+  ON CONFLICT(id) DO UPDATE SET
+    creator_name=@creator_name, profile_scores=@profile_scores, best_fit_profile=@best_fit_profile,
+    best_fit_score=@best_fit_score, reasoning=@reasoning, analyzed_at=datetime('now')
+`);
+
+function upsertAnalysisResult(result) {
+  upsertAnalysisResultStmt.run({
+    id: result.id,
+    platform: result.platform,
+    creator_id: result.creator_id,
+    creator_name: result.creator_name || null,
+    profile_scores: typeof result.profile_scores === 'string' ? result.profile_scores : JSON.stringify(result.profile_scores),
+    best_fit_profile: result.best_fit_profile,
+    best_fit_score: result.best_fit_score,
+    reasoning: result.reasoning || null,
+  });
+}
+
+function getAllAnalysisResults() {
+  return db.prepare("SELECT * FROM analysis_results ORDER BY best_fit_score DESC").all();
+}
+
+function getAnalysisResultsByPlatform(platform) {
+  return db.prepare("SELECT * FROM analysis_results WHERE platform = ? ORDER BY best_fit_score DESC").all(platform);
+}
+
+function getAnalysisStats() {
+  const rows = db.prepare(`
+    SELECT best_fit_profile, COUNT(*) as count, ROUND(AVG(best_fit_score), 1) as avg_score
+    FROM analysis_results
+    GROUP BY best_fit_profile
+    ORDER BY count DESC
+  `).all();
+  const total = db.prepare("SELECT COUNT(*) as total, ROUND(AVG(best_fit_score), 1) as avg_score FROM analysis_results").get();
+  return { by_profile: rows, total: total.total, avg_score: total.avg_score };
+}
+
+function clearAnalysisResults() {
+  db.prepare("DELETE FROM analysis_results").run();
+}
+
 function getYtCampaignStats() {
   return db.prepare(`
     SELECT
@@ -416,4 +474,10 @@ module.exports = {
   updateYtCampaignStatus,
   getAllYtCampaignStatuses,
   getYtCampaignStats,
+  // Analysis
+  upsertAnalysisResult,
+  getAllAnalysisResults,
+  getAnalysisResultsByPlatform,
+  getAnalysisStats,
+  clearAnalysisResults,
 };
