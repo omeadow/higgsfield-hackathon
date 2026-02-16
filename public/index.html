@@ -1233,12 +1233,14 @@
     }
 
     async function triggerAnalysis() {
+      const password = prompt('Enter password to run analysis:');
+      if (!password) return;
       const btn = document.getElementById('run-analysis-btn');
       const progress = document.getElementById('analysis-progress');
       btn.disabled = true; btn.textContent = 'Analyzing...';
       progress.textContent = 'Sending creators to GPT-4o-mini for scoring...';
       try {
-        const res = await fetch('/api/analysis/run', { method: 'POST' });
+        const res = await fetch('/api/analysis/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
         const data = await res.json();
         if (data.error) progress.textContent = 'Error: ' + data.error;
         else { progress.textContent = `Done! Analyzed ${data.analyzed_count} creators in ${(data.duration_ms / 1000).toFixed(1)}s`; await loadAnalysisResults(); }

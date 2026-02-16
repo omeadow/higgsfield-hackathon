@@ -93,6 +93,9 @@ app.put("/api/yt/campaigns/:channelId", (req, res) => {
 let analysisRunning = false;
 
 app.post("/api/analysis/run", async (req, res) => {
+  if (req.body.password !== "admin") {
+    return res.status(401).json({ error: "Incorrect password" });
+  }
   if (analysisRunning) {
     return res.status(409).json({ error: "Analysis already running" });
   }
